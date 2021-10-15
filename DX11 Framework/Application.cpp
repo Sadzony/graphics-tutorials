@@ -66,7 +66,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
     }
 
 	// Initialize the world matrix
-	XMStoreFloat4x4(&_world, XMMatrixIdentity());
+	XMStoreFloat4x4(&_sunWorldPos, XMMatrixIdentity());
 
     // Initialize the view matrix
 	XMVECTOR Eye = XMVectorSet(0.0f, 0.0f, -3.0f, 0.0f);
@@ -463,10 +463,21 @@ void Application::Update()
     }
 
     //
-    // Animate the cube
+    // Animate the sun
     //
-	XMStoreFloat4x4(&_world, XMMatrixRotationY(t));
-    XMStoreFloat4x4(&_world2, XMMatrixRotationX(t) * XMMatrixTranslation(3.0f, 0.0f, 5.0f));
+	XMStoreFloat4x4(&_sunWorldPos, XMMatrixScaling(1.2f, 1.2f, 1.2f) * XMMatrixRotationY(t*0.5f) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+
+    //animate the planets
+    XMStoreFloat4x4(&_planet1WorldPos, XMMatrixScaling(0.5f,0.5f,0.5f)* XMMatrixRotationY(1.2f*t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f) * XMMatrixRotationY(t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+    XMStoreFloat4x4(&_planet2WorldPos, XMMatrixScaling(0.7f, 0.7f, 0.7f) * XMMatrixRotationY(t) * XMMatrixTranslation(8.5f, 0.0f, 0.0f) * XMMatrixRotationY(t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+
+    //animate the moons
+
+    XMStoreFloat4x4(&_moon1WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f)
+                                        * XMMatrixRotationY(t) * XMMatrixTranslation(1.2f, 0.0f, 0.0f)  * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+    XMStoreFloat4x4(&_moon2WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(8.5f, 0.0f, 0.0f)
+        * XMMatrixRotationY(t) * XMMatrixTranslation(1.7f, 0.0f, 0.0f) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+
 }
 
 void Application::Draw()
@@ -477,7 +488,7 @@ void Application::Draw()
     float ClearColor[4] = {0.0f, 0.125f, 0.3f, 1.0f}; // red,green,blue,alpha
     _pImmediateContext->ClearRenderTargetView(_pRenderTargetView, ClearColor);
 
-	XMMATRIX world = XMLoadFloat4x4(&_world);
+	XMMATRIX world = XMLoadFloat4x4(&_sunWorldPos);
 	XMMATRIX view = XMLoadFloat4x4(&_view);
 	XMMATRIX projection = XMLoadFloat4x4(&_projection);
     //
@@ -500,12 +511,34 @@ void Application::Draw()
 	_pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 	_pImmediateContext->DrawIndexed(36, 0, 0);        
 
-    /*
-    world = XMLoadFloat4x4(&_world2);
+    //draw planet 1
+    world = XMLoadFloat4x4(&_planet1WorldPos);
     cb.mWorld = XMMatrixTranspose(world);
     _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
     _pImmediateContext->DrawIndexed(36, 0, 0);
-    */
+
+    //draw planet 2
+    world = XMLoadFloat4x4(&_planet2WorldPos);
+    cb.mWorld = XMMatrixTranspose(world);
+    _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+    _pImmediateContext->DrawIndexed(36, 0, 0);
+    
+
+    //draw moon 1
+    world = XMLoadFloat4x4(&_moon1WorldPos);
+    cb.mWorld = XMMatrixTranspose(world);
+    _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+    _pImmediateContext->DrawIndexed(36, 0, 0);
+
+
+    //draw moon 2
+    world = XMLoadFloat4x4(&_moon2WorldPos);
+    cb.mWorld = XMMatrixTranspose(world);
+    _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+    _pImmediateContext->DrawIndexed(36, 0, 0);
+
+
+
     _pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     //
     // Present our back buffer to our front buffer

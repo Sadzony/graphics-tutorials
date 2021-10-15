@@ -39,7 +39,7 @@ private:
 	ID3D11Buffer*           _pVertexBuffer;
 	ID3D11Buffer*           _pIndexBuffer;
 	ID3D11Buffer*           _pConstantBuffer;
-	XMFLOAT4X4              _world, _world2;
+	XMFLOAT4X4              _sunWorldPos, _planet1WorldPos, _planet2WorldPos, _moon1WorldPos, _moon2WorldPos;
 	XMFLOAT4X4              _view;
 	XMFLOAT4X4              _projection;
 
