@@ -1,2 +1,2 @@
-#TargetFrameworkVersion=v4.0:PlatformToolSet=v140:EnableManagedIncrementalBuild=false:VCToolArchitecture=Native32Bit:WindowsTargetPlatformVersion=10.0.10586.0
-Debug|Win32|C:\Users\sf10\Downloads\DX11 Framework 2016\|
+PlatformToolSet=v142:VCToolArchitecture=Native32Bit:VCToolsVersion=14.28.29910:VCServicingVersionCompilers=14.28.29915:TargetPlatformVersion=10.0.19041.0:
+Debug|Win32|C:\Users\s011308k\Downloads\DX11 Framework\graphics-tutorials\DX11 Framework\|

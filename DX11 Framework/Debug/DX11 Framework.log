@@ -1,6 +1,2 @@
 ﻿  Application.cpp
-  DX11 Framework.cpp
-  Generating Code...
-Application.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
-  DX11 Framework.vcxproj -> C:\Users\sf10\Downloads\DX11 Framework 2016\Debug\DX11 Framework.exe
-  DX11 Framework.vcxproj -> C:\Users\sf10\Downloads\DX11 Framework 2016\Debug\DX11 Framework.pdb (Full PDB)
+  DX11 Framework.vcxproj -> C:\Users\s011308k\Downloads\DX11 Framework\graphics-tutorials\DX11 Framework\Debug\DX11 Framework.exe
