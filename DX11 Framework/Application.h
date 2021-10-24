@@ -1,11 +1,11 @@
 #pragma once
-
 #include <windows.h>
 #include <d3d11_1.h>
 #include <d3dcompiler.h>
 #include <directxmath.h>
 #include <directxcolors.h>
 #include "resource.h"
+
 
 using namespace DirectX;
 
@@ -25,6 +25,9 @@ struct ConstantBuffer
 class Application
 {
 private:
+	ID3D11RasterizerState* _wireFrame;
+	ID3D11RasterizerState* _rasterizerSolid;
+	char _currentState;
 	HINSTANCE               _hInst;
 	HWND                    _hWnd;
 	D3D_DRIVER_TYPE         _driverType;
@@ -46,6 +49,8 @@ private:
 	//depth and stencil buffer
 	ID3D11DepthStencilView* _depthStencilView;
 	ID3D11Texture2D* _depthStencilBuffer;
+
+	bool _RKeyPressed;
 
 private:
 	HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);

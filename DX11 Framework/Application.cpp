@@ -69,8 +69,8 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	XMStoreFloat4x4(&_sunWorldPos, XMMatrixIdentity());
 
     // Initialize the view matrix
-	XMVECTOR Eye = XMVectorSet(0.0f, 0.0f, -3.0f, 0.0f);
-	XMVECTOR At = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	XMVECTOR Eye = XMVectorSet(0.0f, 7.0f, -3.0f, 0.0f);
+	XMVECTOR At = XMVectorSet(0.0f, 0.0f, 7.5f, 0.0f);
 	XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
 	XMStoreFloat4x4(&_view, XMMatrixLookAtLH(Eye, At, Up));
@@ -421,6 +421,32 @@ HRESULT Application::InitDevice()
 
     if (FAILED(hr))
         return hr;
+
+
+
+
+
+    //Create wireframe rasterizer state
+    D3D11_RASTERIZER_DESC wfdesc;
+    ZeroMemory(&wfdesc, sizeof(D3D11_RASTERIZER_DESC));
+    wfdesc.FillMode = D3D11_FILL_WIREFRAME;
+    wfdesc.CullMode = D3D11_CULL_NONE;
+    hr = _pd3dDevice->CreateRasterizerState(&wfdesc, &_wireFrame);
+
+    if (FAILED(hr))
+        return hr;
+    //Create solid rasterizer state
+    D3D11_RASTERIZER_DESC soliddesc;
+    ZeroMemory(&soliddesc, sizeof(D3D11_RASTERIZER_DESC));
+    soliddesc.FillMode = D3D11_FILL_SOLID;
+    soliddesc.CullMode = D3D11_CULL_BACK;
+    hr = _pd3dDevice->CreateRasterizerState(&soliddesc, &_rasterizerSolid);
+
+    if (FAILED(hr))
+        return hr;
+    //set rasterrizer state
+    _pImmediateContext->RSSetState(_rasterizerSolid);
+    _currentState = 's';
     return S_OK;
 }
 
@@ -440,6 +466,7 @@ void Application::Cleanup()
     if (_pd3dDevice) _pd3dDevice->Release();
     if (_depthStencilView) _depthStencilView->Release();
     if (_depthStencilBuffer) _depthStencilBuffer->Release();
+    if (_wireFrame) _wireFrame->Release();
 }
 
 void Application::Update()
@@ -468,15 +495,25 @@ void Application::Update()
 	XMStoreFloat4x4(&_sunWorldPos, XMMatrixScaling(1.2f, 1.2f, 1.2f) * XMMatrixRotationY(t*0.5f) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
 
     //animate the planets
-    XMStoreFloat4x4(&_planet1WorldPos, XMMatrixScaling(0.5f,0.5f,0.5f)* XMMatrixRotationY(1.2f*t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f) * XMMatrixRotationY(t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+    XMStoreFloat4x4(&_planet1WorldPos, XMMatrixScaling(0.5f,0.5f,0.5f)* XMMatrixRotationY(1.2f*t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f) * XMMatrixRotationY(-t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
     XMStoreFloat4x4(&_planet2WorldPos, XMMatrixScaling(0.7f, 0.7f, 0.7f) * XMMatrixRotationY(t) * XMMatrixTranslation(8.5f, 0.0f, 0.0f) * XMMatrixRotationY(t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
 
     //animate the moons
 
-    XMStoreFloat4x4(&_moon1WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f)
-                                        * XMMatrixRotationY(t) * XMMatrixTranslation(1.2f, 0.0f, 0.0f)  * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
-    XMStoreFloat4x4(&_moon2WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(8.5f, 0.0f, 0.0f)
-        * XMMatrixRotationY(t) * XMMatrixTranslation(1.7f, 0.0f, 0.0f) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+    XMStoreFloat4x4(&_moon1WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(1.2f, 0.0f, 0.0f) * XMMatrixRotationY(3 * t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f) * XMMatrixRotationY(-t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+    XMStoreFloat4x4(&_moon2WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(1.2f, 0.0f, 0.0f) * XMMatrixRotationY(5*t)* XMMatrixTranslation(8.5f, 0.0f, 0.0f) * XMMatrixRotationY(t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+
+    if (GetAsyncKeyState(0x52) && _RKeyPressed == false) {
+        _RKeyPressed == true;
+        if (_currentState == 's') {
+            _pImmediateContext->RSSetState(_wireFrame);
+            _currentState = 'w';
+        }
+        else if (_currentState == 'w') {
+            _pImmediateContext->RSSetState(_rasterizerSolid);
+            _currentState = 's';
+        }
+    }
 
 }
 
@@ -510,6 +547,8 @@ void Application::Draw()
     _pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
 	_pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 	_pImmediateContext->DrawIndexed(36, 0, 0);        
+
+
 
     //draw planet 1
     world = XMLoadFloat4x4(&_planet1WorldPos);
