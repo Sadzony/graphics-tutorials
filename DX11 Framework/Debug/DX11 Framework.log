@@ -1,3 +1,2 @@
-﻿  Application.cpp
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(507,22): warning C4553: '==': result of expression not used; did you intend '='?
+﻿  Vector3D.cpp
   DX11 Framework.vcxproj -> C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Debug\DX11 Framework.exe
