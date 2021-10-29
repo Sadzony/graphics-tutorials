@@ -9,25 +9,13 @@
       <UniqueIdentifier>{2c3d4c8c-5d1a-459a-a05a-a4e4b608a44e}</UniqueIdentifier>
       <Extensions>fx;fxh;hlsl</Extensions>
     </Filter>
-    <Filter Include="Class Files">
-      <UniqueIdentifier>{c593c8f4-4fb8-4707-a885-8984c33a4a91}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{24bdece1-26db-4112-90a8-7c85a05aaecc}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
-    <ClInclude Include="Vector3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="DX11 Framework.cpp" />
-    <ClCompile Include="Vector3D.cpp">
-      <Filter>Class Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">

@@ -66,7 +66,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
     }
 
 	// Initialize the world matrix
-	XMStoreFloat4x4(&_sunWorldPos, XMMatrixIdentity());
+	XMStoreFloat4x4(&_world, XMMatrixIdentity());
 
     // Initialize the view matrix
 	XMVECTOR Eye = XMVectorSet(0.0f, 7.0f, -3.0f, 0.0f);
@@ -87,6 +87,7 @@ HRESULT Application::InitShadersAndInputLayout()
 
     // Compile the vertex shader
     ID3DBlob* pVSBlob = nullptr;
+
     hr = CompileShaderFromFile(L"DX11 Framework.fx", "VS", "vs_4_0", &pVSBlob);
 
     if (FAILED(hr))
@@ -97,6 +98,7 @@ HRESULT Application::InitShadersAndInputLayout()
     }
 
 	// Create the vertex shader
+    
 	hr = _pd3dDevice->CreateVertexShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, &_pVertexShader);
 
 	if (FAILED(hr))
@@ -151,7 +153,7 @@ HRESULT Application::InitVertexBuffer()
 	HRESULT hr;
 
     // Create vertex buffer
-    SimpleVertex vertices[] =
+    SimpleVertex cubeVertices[] =
     {
         { XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT4( 0.0f, 0.0f, 1.0f, 1.0f ) },
         { XMFLOAT3( 1.0f, 1.0f, -1.0f), XMFLOAT4( 0.0f, 1.0f, 0.0f, 1.0f ) },
@@ -164,21 +166,47 @@ HRESULT Application::InitVertexBuffer()
         { XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
     };
 
-    D3D11_BUFFER_DESC bd;
-	ZeroMemory(&bd, sizeof(bd));
-    bd.Usage = D3D11_USAGE_DEFAULT;
-    bd.ByteWidth = sizeof(SimpleVertex) * 8;
-    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = 0;
+    D3D11_BUFFER_DESC cvb;
+	ZeroMemory(&cvb, sizeof(cvb));
+    cvb.Usage = D3D11_USAGE_DEFAULT;
+    cvb.ByteWidth = sizeof(SimpleVertex) * 8;
+    cvb.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    cvb.CPUAccessFlags = 0;
 
     D3D11_SUBRESOURCE_DATA InitData;
 	ZeroMemory(&InitData, sizeof(InitData));
-    InitData.pSysMem = vertices;
+    InitData.pSysMem = cubeVertices;
 
-    hr = _pd3dDevice->CreateBuffer(&bd, &InitData, &_pVertexBuffer);
+    hr = _pd3dDevice->CreateBuffer(&cvb, &InitData, &_cVertexBuffer);
 
     if (FAILED(hr))
         return hr;
+
+    SimpleVertex pyramidVertices[] =
+    {
+        { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+        { XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+        { XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+        { XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+
+        { XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+
+    };
+
+    D3D11_BUFFER_DESC pvb;
+    ZeroMemory(&pvb, sizeof(pvb));
+    pvb.Usage = D3D11_USAGE_DEFAULT;
+    pvb.ByteWidth = sizeof(SimpleVertex) * 5;
+    pvb.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    pvb.CPUAccessFlags = 0;
+    ZeroMemory(&InitData, sizeof(InitData));
+    InitData.pSysMem = pyramidVertices;
+
+    hr = _pd3dDevice->CreateBuffer(&pvb, &InitData, &_pVertexBuffer);
+
+    if (FAILED(hr))
+        return hr;
+
 
 	return S_OK;
 }
@@ -188,7 +216,7 @@ HRESULT Application::InitIndexBuffer()
 	HRESULT hr;
 
     // Create index buffer
-    WORD indices[] =
+    WORD cubeIndices[] =
     {
         0,1,2,
         2,1,3,
@@ -212,22 +240,49 @@ HRESULT Application::InitIndexBuffer()
 
     };
 
-	D3D11_BUFFER_DESC bd;
-	ZeroMemory(&bd, sizeof(bd));
+	D3D11_BUFFER_DESC cib;
+	ZeroMemory(&cib, sizeof(cib));
 
-    bd.Usage = D3D11_USAGE_DEFAULT;
-    bd.ByteWidth = sizeof(WORD) * 36;     
-    bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	bd.CPUAccessFlags = 0;
+    cib.Usage = D3D11_USAGE_DEFAULT;
+    cib.ByteWidth = sizeof(WORD) * 36;
+    cib.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    cib.CPUAccessFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA InitData;
 	ZeroMemory(&InitData, sizeof(InitData));
-    InitData.pSysMem = indices;
-    hr = _pd3dDevice->CreateBuffer(&bd, &InitData, &_pIndexBuffer);
+    InitData.pSysMem = cubeIndices;
+    hr = _pd3dDevice->CreateBuffer(&cib, &InitData, &_cIndexBuffer);
 
     if (FAILED(hr))
         return hr;
+    WORD pyramidIndices[] =
+    {
+        0,1,2,
+        2,1,3,
 
+        0,4,1,
+        2,4,0,
+        3,4,2,
+        1,4,3,
+
+
+
+    };
+
+    D3D11_BUFFER_DESC pib;
+    ZeroMemory(&pib, sizeof(pib));
+
+    pib.Usage = D3D11_USAGE_DEFAULT;
+    pib.ByteWidth = sizeof(WORD) * 18;
+    pib.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    pib.CPUAccessFlags = 0;
+
+    ZeroMemory(&InitData, sizeof(InitData));
+    InitData.pSysMem = pyramidIndices;
+    hr = _pd3dDevice->CreateBuffer(&pib, &InitData, &_pIndexBuffer);
+
+    if (FAILED(hr))
+        return hr;
 	return S_OK;
 }
 
@@ -411,16 +466,21 @@ HRESULT Application::InitDevice()
     _pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Create the constant buffer
-	D3D11_BUFFER_DESC bd;
-	ZeroMemory(&bd, sizeof(bd));
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(ConstantBuffer);
-	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	bd.CPUAccessFlags = 0;
-    hr = _pd3dDevice->CreateBuffer(&bd, nullptr, &_pConstantBuffer);
+	D3D11_BUFFER_DESC cb;
+	ZeroMemory(&cb, sizeof(cb));
+	cb.Usage = D3D11_USAGE_DEFAULT;
+	cb.ByteWidth = sizeof(ConstantBuffer);
+	cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cb.CPUAccessFlags = 0;
+    hr = _pd3dDevice->CreateBuffer(&cb, nullptr, &_pConstantBuffer);
 
     if (FAILED(hr))
         return hr;
+    //set the constant buffer
+    _pImmediateContext->VSSetShader(_pVertexShader, nullptr, 0);
+    _pImmediateContext->VSSetConstantBuffers(0, 1, &_pConstantBuffer);
+    _pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
+    _pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 
 
 
@@ -488,10 +548,18 @@ void Application::Update()
 
         t = (dwTimeCur - dwTimeStart) / 1000.0f;
     }
-
+    //send time to constant buffer
+    ConstantBuffer cb;
+    cb.gTime = t;
+    _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+    _pImmediateContext->VSSetShader(_pVertexShader, nullptr, 0);
+    _pImmediateContext->VSSetConstantBuffers(0, 1, &_pConstantBuffer);
+    _pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
+    _pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
     //
     // Animate the sun
     //
+
 	XMStoreFloat4x4(&_sunWorldPos, XMMatrixScaling(1.2f, 1.2f, 1.2f) * XMMatrixRotationY(t*0.5f) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
 
     //animate the planets
@@ -504,7 +572,7 @@ void Application::Update()
     XMStoreFloat4x4(&_moon2WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(1.2f, 0.0f, 0.0f) * XMMatrixRotationY(5*t)* XMMatrixTranslation(8.5f, 0.0f, 0.0f) * XMMatrixRotationY(t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
 
     if (GetAsyncKeyState(0x52) && _RKeyPressed == false) {
-        _RKeyPressed == true;
+        _RKeyPressed = true;
         if (_currentState == 's') {
             _pImmediateContext->RSSetState(_wireFrame);
             _currentState = 'w';
@@ -514,6 +582,11 @@ void Application::Update()
             _currentState = 's';
         }
     }
+    else if (!GetAsyncKeyState(0x52)) {
+        _RKeyPressed = false;
+    }
+
+
 
 }
 
@@ -524,6 +597,14 @@ void Application::Draw()
     //
     float ClearColor[4] = {0.0f, 0.125f, 0.3f, 1.0f}; // red,green,blue,alpha
     _pImmediateContext->ClearRenderTargetView(_pRenderTargetView, ClearColor);
+
+
+    //change vertex and index buffer to pyramid
+    UINT stride = sizeof(SimpleVertex);
+    UINT offset = 0;
+    _pImmediateContext->IASetVertexBuffers(0, 1, &_pVertexBuffer, &stride, &offset);
+    _pImmediateContext->IASetIndexBuffer(_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+
 
 	XMMATRIX world = XMLoadFloat4x4(&_sunWorldPos);
 	XMMATRIX view = XMLoadFloat4x4(&_view);
@@ -538,17 +619,20 @@ void Application::Draw()
 
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 
-
-    //
-    // Renders a triangle
-    //
-	_pImmediateContext->VSSetShader(_pVertexShader, nullptr, 0);
-	_pImmediateContext->VSSetConstantBuffers(0, 1, &_pConstantBuffer);
+    _pImmediateContext->VSSetShader(_pVertexShader, nullptr, 0);
+    _pImmediateContext->VSSetConstantBuffers(0, 1, &_pConstantBuffer);
     _pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
-	_pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
-	_pImmediateContext->DrawIndexed(36, 0, 0);        
+    _pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 
+    //
+    // Renders sun
+    //
 
+	_pImmediateContext->DrawIndexed(18, 0, 0);        
+
+    //change vertex and index buffer to cube
+    _pImmediateContext->IASetVertexBuffers(0, 1, &_cVertexBuffer, &stride, &offset);
+    _pImmediateContext->IASetIndexBuffer(_cIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
     //draw planet 1
     world = XMLoadFloat4x4(&_planet1WorldPos);
