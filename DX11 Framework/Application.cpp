@@ -207,6 +207,53 @@ HRESULT Application::InitVertexBuffer()
     if (FAILED(hr))
         return hr;
 
+    SimpleVertex planeVertices[] =
+    {
+        { XMFLOAT3(-2.0f, 0.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(0.0f, 0.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(1.0f, 0.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(2.0f, 0.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+
+        { XMFLOAT3(-2.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(0.0f,  0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(1.0f,  0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(2.0f,  0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+
+        { XMFLOAT3(-2.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(0.0f,  0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(1.0f,  0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(2.0f,  0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+                         
+        { XMFLOAT3(-2.0f, 0.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(0.0f,  0.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(1.0f,  0.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(2.0f,  0.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+                         
+        { XMFLOAT3(-2.0f, 0.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(0.0f,  0.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(1.0f,  0.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(2.0f,  0.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+
+    };
+
+    D3D11_BUFFER_DESC plvb;
+    ZeroMemory(&plvb, sizeof(plvb));
+    plvb.Usage = D3D11_USAGE_DEFAULT;
+    plvb.ByteWidth = sizeof(SimpleVertex) * 25;
+    plvb.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    plvb.CPUAccessFlags = 0;
+    ZeroMemory(&InitData, sizeof(InitData));
+    InitData.pSysMem = planeVertices;
+
+    hr = _pd3dDevice->CreateBuffer(&plvb, &InitData, &_plVertexBuffer);
+
+    if (FAILED(hr))
+        return hr;
 
 	return S_OK;
 }
@@ -283,6 +330,75 @@ HRESULT Application::InitIndexBuffer()
 
     if (FAILED(hr))
         return hr;
+    WORD planeIndices[] =
+    {
+        //first row
+        0,1,5,
+        5,1,6,
+
+        1,2,6,
+        6,2,7,
+
+        2,3,7,
+        7,3,8,
+
+        3,4,8,
+        8,4,9,
+
+        //second row
+        5,6,10,
+        10,6,11,
+
+        6,7,11,
+        11,7,12,
+
+        7,8,12,
+        12,8,13,
+
+        8,9,13,
+        13,9,14,
+
+        //third row
+        10,11,15,
+        15,11,16,
+
+        11,12,16,
+        16,12,17,
+
+        12,13,17,
+        17,13,18,
+
+        13,14,18,
+        18,14,19,
+
+        //fourth row
+        15,16,20,
+        20,16,21,
+
+        16,17,21,
+        21,17,22,
+
+        17,18,22,
+        22,18,23,
+
+        18,19,23,
+        23,19,24,
+    };
+
+    D3D11_BUFFER_DESC plib;
+    ZeroMemory(&plib, sizeof(plib));
+
+    plib.Usage = D3D11_USAGE_DEFAULT;
+    plib.ByteWidth = sizeof(WORD) * 96;
+    plib.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    plib.CPUAccessFlags = 0;
+
+    ZeroMemory(&InitData, sizeof(InitData));
+    InitData.pSysMem = planeIndices;
+    hr = _pd3dDevice->CreateBuffer(&plib, &InitData, &_plIndexBuffer);
+    if (FAILED(hr))
+        return hr;
+
 	return S_OK;
 }
 
@@ -549,13 +665,7 @@ void Application::Update()
         t = (dwTimeCur - dwTimeStart) / 1000.0f;
     }
     //send time to constant buffer
-    ConstantBuffer cb;
-    cb.gTime = t;
-    _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-    _pImmediateContext->VSSetShader(_pVertexShader, nullptr, 0);
-    _pImmediateContext->VSSetConstantBuffers(0, 1, &_pConstantBuffer);
-    _pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
-    _pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
+    updateTime = t;
     //
     // Animate the sun
     //
@@ -570,6 +680,9 @@ void Application::Update()
 
     XMStoreFloat4x4(&_moon1WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(1.2f, 0.0f, 0.0f) * XMMatrixRotationY(3 * t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f) * XMMatrixRotationY(-t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
     XMStoreFloat4x4(&_moon2WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(1.2f, 0.0f, 0.0f) * XMMatrixRotationY(5*t)* XMMatrixTranslation(8.5f, 0.0f, 0.0f) * XMMatrixRotationY(t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+
+    //place the plane
+    XMStoreFloat4x4(&_planeWorldPos, XMMatrixScaling(10.0f, 10.0f, 10.0f) * XMMatrixTranslation(0.0f, -3.0f, 7.5f));
 
     if (GetAsyncKeyState(0x52) && _RKeyPressed == false) {
         _RKeyPressed = true;
@@ -616,6 +729,7 @@ void Application::Draw()
 	cb.mWorld = XMMatrixTranspose(world);
 	cb.mView = XMMatrixTranspose(view);
 	cb.mProjection = XMMatrixTranspose(projection);
+    cb.gTime = updateTime;
 
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 
@@ -660,7 +774,15 @@ void Application::Draw()
     _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
     _pImmediateContext->DrawIndexed(36, 0, 0);
 
+    //change vertex and index buffer to plane
+    _pImmediateContext->IASetVertexBuffers(0, 1, &_plVertexBuffer, &stride, &offset);
+    _pImmediateContext->IASetIndexBuffer(_plIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
+    //draw plane
+    world = XMLoadFloat4x4(&_planeWorldPos);
+    cb.mWorld = XMMatrixTranspose(world);
+    _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+    _pImmediateContext->DrawIndexed(96, 0, 0);
 
     _pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     //
