@@ -5,14 +5,14 @@
 #include <directxmath.h>
 #include <directxcolors.h>
 #include "resource.h"
-
+#include <vector>
 
 using namespace DirectX;
 
 struct SimpleVertex
 {
     XMFLOAT3 Pos;
-    XMFLOAT4 Color;
+    XMFLOAT3 Normal;
 };
 
 struct ConstantBuffer
@@ -70,6 +70,8 @@ private:
 
 	UINT _WindowHeight;
 	UINT _WindowWidth;
+
+	void CalculateVertexNormals(SimpleVertex vertexArray[], int arraySize, WORD indicesArray[], int indicesArraySize);
 
 public:
 	Application();

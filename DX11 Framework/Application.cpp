@@ -23,6 +23,56 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
+void Application::CalculateVertexNormals(SimpleVertex vertexArray[], int vertexArraySize, WORD indicesArray[], int indicesArraySize)
+{
+    int numberOfTriangles = (int)(indicesArraySize / 3);
+    XMVECTOR *surfaceNormals = new XMVECTOR[numberOfTriangles];
+    for (int i = 0; i < indicesArraySize; i++) {
+        if (i % 3 == 0) {
+            XMFLOAT3 vertex1 = vertexArray[indicesArray[i]].Pos;
+            XMFLOAT3 vertex2 = vertexArray[indicesArray[i+1]].Pos; //take 3 vertices on the same triangle
+            XMFLOAT3 vertex3 = vertexArray[indicesArray[i + 2]].Pos;
+
+            XMVECTOR posVector1 = XMLoadFloat3(&vertex1);
+            XMVECTOR posVector2 = XMLoadFloat3(&vertex2); //turn them into pos vectors
+            XMVECTOR posVector3 = XMLoadFloat3(&vertex3);
+
+            XMVECTOR uVector = -posVector1 + posVector2; //from 1 to 2
+            XMVECTOR vVector = -posVector2 + posVector3; //from 2 to 3
+
+            XMVECTOR normal = XMVector3Cross(uVector, vVector);
+            normal = XMVector3Normalize(normal);
+            surfaceNormals[(int)(i / 3)] = normal;
+        }
+    }
+    for (int i = 0; i < vertexArraySize; i++) { // for each vertex
+        std::vector<int> triangleAppearances;
+        std::vector<int> surfaceNormalArrayPositions;
+        for (int j = 0; j < indicesArraySize; j++) {
+            if ((int)(indicesArray[j]) == i) {
+                triangleAppearances.push_back(j); //find every triangle which contains vertex
+                if (j % 3 == 0) {
+                    surfaceNormalArrayPositions.push_back((int)(j/3));
+                }
+                else if (j % 3 == 1) {
+                    surfaceNormalArrayPositions.push_back((int)((j-1) / 3));
+                }
+                else if (j % 3 == 2) {
+                    surfaceNormalArrayPositions.push_back((int)((j - 2) / 3));
+                }
+            }
+        }
+        XMFLOAT3 zero = XMFLOAT3(0, 0, 0);
+        XMVECTOR totalNormals = XMLoadFloat3(&zero);
+        for (int j = 0; j < triangleAppearances.size(); j++) { //for each time the vertex appears in a triangle
+            totalNormals += surfaceNormals[surfaceNormalArrayPositions.at(j)];
+        }
+        XMVECTOR average = XMVector3Normalize(totalNormals / triangleAppearances.size());
+        XMStoreFloat3(&vertexArray[i].Normal, average);
+    }
+    delete[] surfaceNormals;
+}
+
 Application::Application()
 {
 	_hInst = nullptr;
@@ -155,15 +205,15 @@ HRESULT Application::InitVertexBuffer()
     // Create vertex buffer
     SimpleVertex cubeVertices[] =
     {
-        { XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT4( 0.0f, 0.0f, 1.0f, 1.0f ) },
-        { XMFLOAT3( 1.0f, 1.0f, -1.0f), XMFLOAT4( 0.0f, 1.0f, 0.0f, 1.0f ) },
-        { XMFLOAT3( -1.0f, -1.0f, -1.0f), XMFLOAT4( 0.0f, 1.0f, 1.0f, 1.0f ) },
-        { XMFLOAT3( 1.0f, -1.0f, -1.0f), XMFLOAT4( 1.0f, 0.0f, 0.0f, 1.0f ) },
+        { XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3( 1.0f, 1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3( -1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3( 1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
 
-        { XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-        { XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+        { XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(1.0f, 1.0f, 1.0f),XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
     };
 
     D3D11_BUFFER_DESC cvb;
@@ -184,12 +234,12 @@ HRESULT Application::InitVertexBuffer()
 
     SimpleVertex pyramidVertices[] =
     {
-        { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-        { XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-        { XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-        { XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+        { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(1.0f, -1.0f, 1.0f),XMFLOAT3(0.0f, 0.0f, 0.0f) },
 
-        { XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+        { XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
 
     };
 
@@ -209,35 +259,35 @@ HRESULT Application::InitVertexBuffer()
 
     SimpleVertex planeVertices[] =
     {
-        { XMFLOAT3(-2.0f, 0.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(0.0f, 0.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(1.0f, 0.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(2.0f, 0.0f, 2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(0.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(1.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(2.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
 
-        { XMFLOAT3(-2.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(0.0f,  0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(1.0f,  0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(2.0f,  0.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(0.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(1.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(2.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
 
-        { XMFLOAT3(-2.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(0.0f,  0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(1.0f,  0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(2.0f,  0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(0.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(1.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(2.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
                          
-        { XMFLOAT3(-2.0f, 0.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(0.0f,  0.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(1.0f,  0.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(2.0f,  0.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(0.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(1.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(2.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
                          
-        { XMFLOAT3(-2.0f, 0.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(0.0f,  0.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(1.0f,  0.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-        { XMFLOAT3(2.0f,  0.0f, -2.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, -2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, -2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(0.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(1.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(2.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
 
     };
 
@@ -302,6 +352,7 @@ HRESULT Application::InitIndexBuffer()
 
     if (FAILED(hr))
         return hr;
+
     WORD pyramidIndices[] =
     {
         0,1,2,
