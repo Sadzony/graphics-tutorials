@@ -71,7 +71,7 @@ private:
 	UINT _WindowHeight;
 	UINT _WindowWidth;
 
-	void CalculateVertexNormals(SimpleVertex vertexArray[], int arraySize, WORD indicesArray[], int indicesArraySize);
+	void CalculateVertexNormals(ID3D11Buffer* vertexBuffer, ID3D11Buffer* indexBuffer, int numberOfVertices, int numberOfIndices);
 
 public:
 	Application();

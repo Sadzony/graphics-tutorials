@@ -1,5 +1,6 @@
 ﻿  Application.cpp
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(29,63): warning C4316: '__m128': object allocated on the heap may not be aligned 16
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(67,27): warning C4018: '<': signed/unsigned mismatch
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(70,86): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(26,122): warning C4100: 'indicesArraySize': unreferenced formal parameter
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(26,101): warning C4100: 'vertexArraySize': unreferenced formal parameter
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(26,84): warning C4100: 'indexBuffer': unreferenced formal parameter
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(26,56): warning C4100: 'vertexBuffer': unreferenced formal parameter
   DX11 Framework.vcxproj -> C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Debug\DX11 Framework.exe

@@ -23,15 +23,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-void Application::CalculateVertexNormals(SimpleVertex vertexArray[], int vertexArraySize, WORD indicesArray[], int indicesArraySize)
+void Application::CalculateVertexNormals(ID3D11Buffer* vertexBuffer, ID3D11Buffer* indexBuffer, int vertexArraySize, int indicesArraySize)
 {
+    /*
+    // take buffers and prepare them for reading/writing
+    D3D11_MAPPED_SUBRESOURCE vResource;
+    _pImmediateContext->Map(vertexBuffer, 0, D3D11_MAP_READ_WRITE, 0, &vResource); //read write performance ok as this is only run once
+    SimpleVertex* vertexArray = new SimpleVertex[vertexArraySize]; //new vertex array to be copied into the old one
+    memcpy(vertexArray, vResource.pData, vertexArraySize * sizeof(SimpleVertex));
+
+    D3D11_MAPPED_SUBRESOURCE iResource;
+    _pImmediateContext->Map(indexBuffer, 0, D3D11_MAP_READ, 0, &iResource);
+    WORD* indicesArray = new WORD[indicesArraySize]; 
+    memcpy(indicesArray, iResource.pData, indicesArraySize * sizeof(WORD));
+
     int numberOfTriangles = (int)(indicesArraySize / 3);
     XMVECTOR *surfaceNormals = new XMVECTOR[numberOfTriangles];
     for (int i = 0; i < indicesArraySize; i++) {
         if (i % 3 == 0) {
-            XMFLOAT3 vertex1 = vertexArray[indicesArray[i]].Pos;
-            XMFLOAT3 vertex2 = vertexArray[indicesArray[i+1]].Pos; //take 3 vertices on the same triangle
-            XMFLOAT3 vertex3 = vertexArray[indicesArray[i + 2]].Pos;
+            XMFLOAT3 vertex1 = vertexArray[(int)indicesArray[i]].Pos;
+            XMFLOAT3 vertex2 = vertexArray[(int)indicesArray[i+1]].Pos; //take 3 vertices on the same triangle
+            XMFLOAT3 vertex3 = vertexArray[(int)indicesArray[i + 2]].Pos;
 
             XMVECTOR posVector1 = XMLoadFloat3(&vertex1);
             XMVECTOR posVector2 = XMLoadFloat3(&vertex2); //turn them into pos vectors
@@ -71,6 +83,10 @@ void Application::CalculateVertexNormals(SimpleVertex vertexArray[], int vertexA
         XMStoreFloat3(&vertexArray[i].Normal, average);
     }
     delete[] surfaceNormals;
+    //copy new vertexArray into vertex Buffer
+    _pImmediateContext->Unmap(vertexBuffer, 0);
+    _pImmediateContext->Unmap(indexBuffer, 0);
+    */
 }
 
 Application::Application()
@@ -248,7 +264,7 @@ HRESULT Application::InitVertexBuffer()
     pvb.Usage = D3D11_USAGE_DEFAULT;
     pvb.ByteWidth = sizeof(SimpleVertex) * 5;
     pvb.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    pvb.CPUAccessFlags = 0;
+    pvb.CPUAccessFlags = 0; 
     ZeroMemory(&InitData, sizeof(InitData));
     InitData.pSysMem = pyramidVertices;
 
@@ -343,7 +359,7 @@ HRESULT Application::InitIndexBuffer()
     cib.Usage = D3D11_USAGE_DEFAULT;
     cib.ByteWidth = sizeof(WORD) * 36;
     cib.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    cib.CPUAccessFlags = 0;
+    cib.CPUAccessFlags = 0; //allow reading of the buffer
 
 	D3D11_SUBRESOURCE_DATA InitData;
 	ZeroMemory(&InitData, sizeof(InitData));
