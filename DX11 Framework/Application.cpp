@@ -250,12 +250,12 @@ HRESULT Application::InitVertexBuffer()
 
     SimpleVertex pyramidVertices[] =
     {
-        { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.7071067811865476f, 0.0f, 0.7071067811865476f) },
-        { XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(-0.5773502691896257, 0.5773502691896257, 0.5773502691896257) },
-        { XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(0.7071067811865476f, 0.0f, 0.7071067811865476f) },
-        { XMFLOAT3(1.0f, -1.0f, 1.0f),XMFLOAT3(-0.5773502691896257f, 0.5773502691896257f, 0.5773502691896257f) },
+        { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(-0.7071f, 0.0f, -0.7071f) },
+        { XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.7071f, 0.0f, -0.7071f) },
+        { XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(-0.7071f, 0.0f, 0.7071f) },
+        { XMFLOAT3(1.0f, -1.0f, 1.0f),XMFLOAT3(0.7071f, 0.0f, 0.7071f) },
 
-        { XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, -0.4472135954999579f, 0.8944271909999159f) },
+        { XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
 
     };
 
@@ -275,35 +275,35 @@ HRESULT Application::InitVertexBuffer()
 
     SimpleVertex planeVertices[] =
     {
-        { XMFLOAT3(-2.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(0.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(1.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(2.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(0.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(1.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(2.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
 
-        { XMFLOAT3(-2.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(0.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(1.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(2.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(0.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(1.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(2.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
 
-        { XMFLOAT3(-2.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(0.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(1.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(2.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(0.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(1.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(2.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
                          
-        { XMFLOAT3(-2.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(0.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(1.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(2.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(0.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(1.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(2.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
                          
-        { XMFLOAT3(-2.0f, 0.0f, -2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, -2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(0.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(1.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-        { XMFLOAT3(2.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(0.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(1.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(2.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
 
     };
 

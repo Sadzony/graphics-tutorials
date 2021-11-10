@@ -1,6 +1,6 @@
 ﻿  Application.cpp
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(26,122): warning C4100: 'indicesArraySize': unreferenced formal parameter
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(26,101): warning C4100: 'vertexArraySize': unreferenced formal parameter
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(26,84): warning C4100: 'indexBuffer': unreferenced formal parameter
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(26,56): warning C4100: 'vertexBuffer': unreferenced formal parameter
-  DX11 Framework.vcxproj -> C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Debug\DX11 Framework.exe
+C:\Users\s011308k\Documents\graphics-tutorials\DX11 Framework\Application.cpp(26,122): warning C4100: 'indicesArraySize': unreferenced formal parameter
+C:\Users\s011308k\Documents\graphics-tutorials\DX11 Framework\Application.cpp(26,101): warning C4100: 'vertexArraySize': unreferenced formal parameter
+C:\Users\s011308k\Documents\graphics-tutorials\DX11 Framework\Application.cpp(26,84): warning C4100: 'indexBuffer': unreferenced formal parameter
+C:\Users\s011308k\Documents\graphics-tutorials\DX11 Framework\Application.cpp(26,56): warning C4100: 'vertexBuffer': unreferenced formal parameter
+  DX11 Framework.vcxproj -> C:\Users\s011308k\Documents\graphics-tutorials\DX11 Framework\Debug\DX11 Framework.exe
