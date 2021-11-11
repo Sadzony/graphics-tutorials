@@ -665,8 +665,15 @@ HRESULT Application::InitDevice()
     _pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
     _pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 
-
-
+    //set light values
+    lightDirection = XMFLOAT3(0.25f, 0.5f, -1.0f);
+    diffuseMaterial = XMFLOAT4(0.8f, 0.5f, 0.5f, 1.0f);
+    diffuseLight = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+    ambientMaterial = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+    specularLight = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+    specularMaterial = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+    specularPower = 10.0f;
 
 
     //Create wireframe rasterizer state
@@ -740,7 +747,7 @@ void Application::Update()
 	XMStoreFloat4x4(&_sunWorldPos, XMMatrixScaling(1.2f, 1.2f, 1.2f) * XMMatrixRotationY(t*0.5f) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
 
     //animate the planets
-    XMStoreFloat4x4(&_planet1WorldPos, XMMatrixScaling(0.5f,0.5f,0.5f)* XMMatrixRotationY(1.2f*t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f) * XMMatrixRotationY(-t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+    XMStoreFloat4x4(&_planet1WorldPos, XMMatrixScaling(0.5f,0.5f,0.5f)* XMMatrixRotationY(-t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f) * XMMatrixRotationY(-t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
     XMStoreFloat4x4(&_planet2WorldPos, XMMatrixScaling(0.7f, 0.7f, 0.7f) * XMMatrixRotationY(t) * XMMatrixTranslation(8.5f, 0.0f, 0.0f) * XMMatrixRotationY(t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
 
     //animate the moons
@@ -796,6 +803,16 @@ void Application::Draw()
 	cb.mWorld = XMMatrixTranspose(world);
 	cb.mView = XMMatrixTranspose(view);
 	cb.mProjection = XMMatrixTranspose(projection);
+    cb.DiffuseLight = diffuseLight;
+    cb.DiffuseMaterial = diffuseMaterial;
+    cb.AmbientLight = ambientLight;
+    cb.AmbientMaterial = ambientMaterial;
+    cb.SpecularLight = specularLight;
+    cb.SpecularMaterial = specularMaterial;
+    cb.SpecularPower = specularPower;
+    cb.EyePosW = XMFLOAT3(0.0f, 7.0f, -3.0f);
+    
+    cb.LightVecw = lightDirection;
     cb.gTime = updateTime;
 
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
@@ -805,6 +822,7 @@ void Application::Draw()
     _pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
     _pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 
+    
     //
     // Renders sun
     //

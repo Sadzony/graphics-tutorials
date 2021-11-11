@@ -20,7 +20,21 @@ struct ConstantBuffer
 	XMMATRIX mWorld;
 	XMMATRIX mView;
 	XMMATRIX mProjection;
+
+	XMFLOAT4 AmbientLight;
+	XMFLOAT4 AmbientMaterial;
+
+	XMFLOAT4 DiffuseMaterial;
+	XMFLOAT4 DiffuseLight;
+
+	XMFLOAT4 SpecularMaterial;
+	XMFLOAT4 SpecularLight;
+	float SpecularPower;
+	XMFLOAT3 EyePosW;
+
+	XMFLOAT3 LightVecw;
 	float gTime;
+
 };
 
 class Application
@@ -50,6 +64,18 @@ private:
 	XMFLOAT4X4              _world;
 	XMFLOAT4X4              _view;
 	XMFLOAT4X4              _projection;
+
+	//light objects
+	XMFLOAT3 lightDirection;
+	XMFLOAT4 diffuseMaterial;
+	XMFLOAT4 diffuseLight;
+
+	XMFLOAT4 ambientLight;
+	XMFLOAT4 ambientMaterial;
+
+	XMFLOAT4 specularLight;
+	XMFLOAT4 specularMaterial;
+	float specularPower;
 
 	//world objects
 	XMFLOAT4X4              _sunWorldPos, _planet1WorldPos, _planet2WorldPos, _moon1WorldPos, _moon2WorldPos, _planeWorldPos;
