@@ -4,6 +4,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //--------------------------------------------------------------------------------------
 
+
+//texture variables
+Texture2D txDiffuse : register( t0 );
+SamplerState samLinear : register(s0);
+
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
@@ -38,12 +43,14 @@ struct VS_OUTPUT
     float4 Pos : SV_POSITION;
     float3 Normal : NORMAL;
     float3 PosW : POSITION;
+    float2 Tex : TEXCOOORD0;
 };
+
 
 //--------------------------------------------------------------------------------------
 // Vertex Shader
 //--------------------------------------------------------------------------------------
-VS_OUTPUT VS( float4 Pos : POSITION, float3 normal: NORMAL )
+VS_OUTPUT VS( float4 Pos : POSITION, float3 normal: NORMAL, float2 Tex : TEXCOORD0)
 {
 
     VS_OUTPUT output = (VS_OUTPUT)0;
@@ -59,7 +66,7 @@ VS_OUTPUT VS( float4 Pos : POSITION, float3 normal: NORMAL )
     float3 normalW = mul(float4(normal, 0.0f), World).xyz;
     normalW = normalize(normalW);
     output.Normal = normalW;
-    
+    output.Tex = Tex;
     return output;
 }
 
@@ -72,8 +79,9 @@ float4 PS( VS_OUTPUT input ) : SV_Target
     float3 toEye = normalize(EyePosW - input.PosW);
     input.Normal = normalize(input.Normal);
     //compute color 
+    float4 textureColor = txDiffuse.Sample(samLinear, input.Tex);
     float diffuseAmount = max(dot(LightVecw, input.Normal), 0.0f);
-    float3 diffuse = diffuseAmount * (DiffuseMaterial * DiffuseLight).rgb;
+    float3 diffuse = diffuseAmount * (textureColor * DiffuseLight).rgb;
     float3 ambient = (AmbientLight * AmbientMaterial).rgb;
     float3 r = reflect(-LightVecw, input.Normal); //reflection vector
     //determine how much (if any) specular light makes it to the eye

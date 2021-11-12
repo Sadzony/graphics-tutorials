@@ -196,6 +196,7 @@ HRESULT Application::InitShadersAndInputLayout()
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
 	UINT numElements = ARRAYSIZE(layout);
@@ -221,15 +222,15 @@ HRESULT Application::InitVertexBuffer()
     // Create vertex buffer
     SimpleVertex cubeVertices[] =
     {
-        { XMFLOAT3( -1.0f, 1.0f, -1.0f ), XMFLOAT3(-0.816497f, 0.408248f, -0.408248f) },
-        { XMFLOAT3( 1.0f, 1.0f, -1.0f), XMFLOAT3(0.333333f, 0.666667f, -0.666667f) },
-        { XMFLOAT3( -1.0f, -1.0f, -1.0f), XMFLOAT3(-0.408248f, -0.408248f, -0.816497f) },
-        { XMFLOAT3( 1.0f, -1.0f, -1.0f), XMFLOAT3(0.666667f, -0.666667f, -0.333333) },
+        { XMFLOAT3( -1.0f, 1.0f, -1.0f ),   XMFLOAT3(-0.816497f, 0.408248f, -0.408248f),    XMFLOAT2(0.0f,1.0f) },
+        { XMFLOAT3( 1.0f, 1.0f, -1.0f),     XMFLOAT3(0.333333f, 0.666667f, -0.666667f),     XMFLOAT2(1.0f,1.0f) },
+        { XMFLOAT3( -1.0f, -1.0f, -1.0f),   XMFLOAT3(-0.408248f, -0.408248f, -0.816497f),   XMFLOAT2(0.0f,0.0f) },
+        { XMFLOAT3( 1.0f, -1.0f, -1.0f),    XMFLOAT3(0.666667f, -0.666667f, -0.333333),     XMFLOAT2(1.0f,0.0f) },
 
-        { XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT3(-0.333333f, 0.666667f, 0.666667f) },
-        { XMFLOAT3(1.0f, 1.0f, 1.0f),XMFLOAT3(0.816497f, 0.408248f, 0.408248f) },
-        { XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(-0.666667f, -0.666667f, 0.333333f) },
-        { XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT3(0.408248f, -0.408248f, 0.816497f) },
+        { XMFLOAT3(-1.0f, 1.0f, 1.0f),  XMFLOAT3(-0.333333f, 0.666667f, 0.666667f),  XMFLOAT2(0.0f,1.0f) },
+        { XMFLOAT3(1.0f, 1.0f, 1.0f),   XMFLOAT3(0.816497f, 0.408248f, 0.408248f),   XMFLOAT2(1.0f,1.0f) },
+        { XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(-0.666667f, -0.666667f, 0.333333f), XMFLOAT2(0.0f,0.0f) },
+        { XMFLOAT3(1.0f, -1.0f, 1.0f),  XMFLOAT3(0.408248f, -0.408248f, 0.816497f),  XMFLOAT2(1.0f,0.0f) },
     };
 
     D3D11_BUFFER_DESC cvb;
@@ -250,12 +251,12 @@ HRESULT Application::InitVertexBuffer()
 
     SimpleVertex pyramidVertices[] =
     {
-        { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(-0.7071f, 0.0f, -0.7071f) },
-        { XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(0.7071f, 0.0f, -0.7071f) },
-        { XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(-0.7071f, 0.0f, 0.7071f) },
-        { XMFLOAT3(1.0f, -1.0f, 1.0f),XMFLOAT3(0.7071f, 0.0f, 0.7071f) },
+        { XMFLOAT3(-1.0f, -1.0f, -1.0f),    XMFLOAT3(-0.7071f, 0.0f, -0.7071f), XMFLOAT2(0.0f,0.0f) },
+        { XMFLOAT3(1.0f, -1.0f, -1.0f),     XMFLOAT3(0.7071f, 0.0f, -0.7071f),  XMFLOAT2(1.0f,0.0f) },
+        { XMFLOAT3(-1.0f, -1.0f, 1.0f),     XMFLOAT3(-0.7071f, 0.0f, 0.7071f),  XMFLOAT2(0.0f,0.0f) },
+        { XMFLOAT3(1.0f, -1.0f, 1.0f),      XMFLOAT3(0.7071f, 0.0f, 0.7071f),   XMFLOAT2(1.0f,0.0f) },
 
-        { XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.5f,1.0f) },
 
     };
 
@@ -275,35 +276,35 @@ HRESULT Application::InitVertexBuffer()
 
     SimpleVertex planeVertices[] =
     {
-        { XMFLOAT3(-2.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(0.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(1.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(2.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f ,1.0f)},
+        { XMFLOAT3(-1.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.25f,1.0f) },
+        { XMFLOAT3(0.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),   XMFLOAT2(0.5f ,1.0f) },
+        { XMFLOAT3(1.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),   XMFLOAT2(0.75f,1.0f) },
+        { XMFLOAT3(2.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),   XMFLOAT2(1.0f ,1.0f) },
 
-        { XMFLOAT3(-2.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(0.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(1.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(2.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f ,0.75f) },
+        { XMFLOAT3(-1.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.25f,0.75f) },
+        { XMFLOAT3(0.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.5f ,0.75f) },
+        { XMFLOAT3(1.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.75f,0.75f) },
+        { XMFLOAT3(2.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(1.0f ,0.75f) },
 
-        { XMFLOAT3(-2.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(0.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(1.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(2.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f ,0.5f) },
+        { XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.25f,0.5f) },
+        { XMFLOAT3(0.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.5f ,0.5f) },
+        { XMFLOAT3(1.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.75f,0.5f) },
+        { XMFLOAT3(2.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(1.0f ,0.5f) },
                          
-        { XMFLOAT3(-2.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(0.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(1.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(2.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f ,0.25f) },
+        { XMFLOAT3(-1.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.25f,0.25f) },
+        { XMFLOAT3(0.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.5f ,0.25f) },
+        { XMFLOAT3(1.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.75f,0.25f) },
+        { XMFLOAT3(2.0f,  0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f ,0.25f) },
                          
-        { XMFLOAT3(-2.0f, 0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(-1.0f, 0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(0.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(1.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-        { XMFLOAT3(2.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f ,0.0f) },
+        { XMFLOAT3(-1.0f, 0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.25f,0.0f) },
+        { XMFLOAT3(0.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.5f ,0.0f) },
+        { XMFLOAT3(1.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.75f,0.0f) },
+        { XMFLOAT3(2.0f,  0.0f, -2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f ,0.0f) },
 
     };
 
@@ -620,6 +621,24 @@ HRESULT Application::InitDevice()
     _pd3dDevice->CreateDepthStencilView(_depthStencilBuffer, nullptr, &_depthStencilView);
 
     _pImmediateContext->OMSetRenderTargets(1, &_pRenderTargetView, _depthStencilView);
+
+    //load texture
+    CreateDDSTextureFromFile(_pd3dDevice, L"Crate.dds", nullptr, &_pTextureRV);
+    _pImmediateContext->VSSetShaderResources(0, 1, &_pTextureRV);
+
+    //define sampler
+    D3D11_SAMPLER_DESC sampDesc;
+    ZeroMemory(&sampDesc, sizeof(sampDesc));
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    sampDesc.MinLOD = 0;
+    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+    _pd3dDevice->CreateSamplerState(&sampDesc, &_pSamplerLinear);
+    _pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
 
     // Setup the viewport
     D3D11_VIEWPORT vp;
