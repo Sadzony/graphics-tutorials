@@ -144,6 +144,23 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
     // Initialize the projection matrix
 	XMStoreFloat4x4(&_projection, XMMatrixPerspectiveFovLH(XM_PIDIV2, _WindowWidth / (FLOAT) _WindowHeight, 0.01f, 100.0f));
 
+    //load texture
+    HRESULT hr = CreateDDSTextureFromFile(_pd3dDevice, L"Crate_COLOR.dds", nullptr, &_pTextureRV);
+    if (FAILED(hr))
+        return hr;
+    //define sampler
+    D3D11_SAMPLER_DESC sampDesc;
+    ZeroMemory(&sampDesc, sizeof(sampDesc));
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    sampDesc.MinLOD = 0;
+    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+    _pd3dDevice->CreateSamplerState(&sampDesc, &_pSamplerLinear);
+    objMeshData = OBJLoader::Load("sphere.obj", _pd3dDevice, false);
 	return S_OK;
 }
 
@@ -622,23 +639,10 @@ HRESULT Application::InitDevice()
 
     _pImmediateContext->OMSetRenderTargets(1, &_pRenderTargetView, _depthStencilView);
 
-    //load texture
-    CreateDDSTextureFromFile(_pd3dDevice, L"Crate.dds", nullptr, &_pTextureRV);
-    _pImmediateContext->VSSetShaderResources(0, 1, &_pTextureRV);
 
-    //define sampler
-    D3D11_SAMPLER_DESC sampDesc;
-    ZeroMemory(&sampDesc, sizeof(sampDesc));
-    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-    sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-    sampDesc.MinLOD = 0;
-    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-    _pd3dDevice->CreateSamplerState(&sampDesc, &_pSamplerLinear);
-    _pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
+
+    
 
     // Setup the viewport
     D3D11_VIEWPORT vp;
@@ -716,6 +720,8 @@ HRESULT Application::InitDevice()
     //set rasterrizer state
     _pImmediateContext->RSSetState(_rasterizerSolid);
     _currentState = 's';
+
+
     return S_OK;
 }
 
@@ -798,19 +804,13 @@ void Application::Update()
 
 void Application::Draw()
 {
+    
     //
     // Clear the back buffer
     //
     float ClearColor[4] = {0.0f, 0.125f, 0.3f, 1.0f}; // red,green,blue,alpha
     _pImmediateContext->ClearRenderTargetView(_pRenderTargetView, ClearColor);
-
-
-    //change vertex and index buffer to pyramid
-    UINT stride = sizeof(SimpleVertex);
-    UINT offset = 0;
-    _pImmediateContext->IASetVertexBuffers(0, 1, &_pVertexBuffer, &stride, &offset);
-    _pImmediateContext->IASetIndexBuffer(_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-
+    _pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	XMMATRIX world = XMLoadFloat4x4(&_sunWorldPos);
 	XMMATRIX view = XMLoadFloat4x4(&_view);
@@ -837,46 +837,60 @@ void Application::Draw()
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 
     _pImmediateContext->VSSetShader(_pVertexShader, nullptr, 0);
-    _pImmediateContext->VSSetConstantBuffers(0, 1, &_pConstantBuffer);
-    _pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
     _pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 
+    _pImmediateContext->VSSetConstantBuffers(0, 1, &_pConstantBuffer);
+    _pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
+
+    _pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
+    //change vertex and index buffer to pyramid
+    UINT stride = sizeof(SimpleVertex);
+    UINT offset = 0;
+    _pImmediateContext->IASetVertexBuffers(0, 1, &objMeshData.VertexBuffer, &stride, &offset);
+    _pImmediateContext->IASetIndexBuffer(objMeshData.IndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+    
+
+    
+    
+    
     
     //
     // Renders sun
     //
-
-	_pImmediateContext->DrawIndexed(18, 0, 0);        
-
+    _pImmediateContext->DrawIndexed(objMeshData.IndexCount, 0, 0);
+	//set texture
+    _pImmediateContext->PSSetShaderResources(0, 1, &_pTextureRV);
     //change vertex and index buffer to cube
-    _pImmediateContext->IASetVertexBuffers(0, 1, &_cVertexBuffer, &stride, &offset);
-    _pImmediateContext->IASetIndexBuffer(_cIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+    //_pImmediateContext->IASetVertexBuffers(0, 1, &_cVertexBuffer, &stride, &offset);
+    //_pImmediateContext->IASetIndexBuffer(_cIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
+    
     //draw planet 1
     world = XMLoadFloat4x4(&_planet1WorldPos);
     cb.mWorld = XMMatrixTranspose(world);
     _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-    _pImmediateContext->DrawIndexed(36, 0, 0);
+    _pImmediateContext->DrawIndexed(objMeshData.IndexCount, 0, 0);
 
     //draw planet 2
     world = XMLoadFloat4x4(&_planet2WorldPos);
     cb.mWorld = XMMatrixTranspose(world);
     _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-    _pImmediateContext->DrawIndexed(36, 0, 0);
+    
+    _pImmediateContext->DrawIndexed(objMeshData.IndexCount, 0, 0);
     
 
     //draw moon 1
     world = XMLoadFloat4x4(&_moon1WorldPos);
     cb.mWorld = XMMatrixTranspose(world);
     _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-    _pImmediateContext->DrawIndexed(36, 0, 0);
+    _pImmediateContext->DrawIndexed(objMeshData.IndexCount, 0, 0);
 
 
     //draw moon 2
     world = XMLoadFloat4x4(&_moon2WorldPos);
     cb.mWorld = XMMatrixTranspose(world);
     _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-    _pImmediateContext->DrawIndexed(36, 0, 0);
+    _pImmediateContext->DrawIndexed(objMeshData.IndexCount, 0, 0);
 
     //change vertex and index buffer to plane
     _pImmediateContext->IASetVertexBuffers(0, 1, &_plVertexBuffer, &stride, &offset);
@@ -886,9 +900,10 @@ void Application::Draw()
     world = XMLoadFloat4x4(&_planeWorldPos);
     cb.mWorld = XMMatrixTranspose(world);
     _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+    
     _pImmediateContext->DrawIndexed(96, 0, 0);
 
-    _pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+    
     //
     // Present our back buffer to our front buffer
     //

@@ -7,15 +7,9 @@
 #include "resource.h"
 #include <vector>
 #include "DDSTextureLoader.h"
-
+#include "Structures.h"
+#include "OBJLoader.h"
 using namespace DirectX;
-
-struct SimpleVertex
-{
-    XMFLOAT3 Pos;
-    XMFLOAT3 Normal;
-	XMFLOAT2 TexC;
-};
 
 struct ConstantBuffer
 {
@@ -85,6 +79,7 @@ private:
 
 	//world objects
 	XMFLOAT4X4              _sunWorldPos, _planet1WorldPos, _planet2WorldPos, _moon1WorldPos, _moon2WorldPos, _planeWorldPos;
+	MeshData objMeshData;
 	//depth and stencil buffer
 	ID3D11DepthStencilView* _depthStencilView;
 	ID3D11Texture2D* _depthStencilBuffer;

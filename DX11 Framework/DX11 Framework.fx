@@ -25,11 +25,12 @@ cbuffer ConstantBuffer : register( b0 )
     
     float4 SpecularMaterial;
     float4 SpecularLight;
+    
     float SpecularPower;
     float3 EyePosW;
     
     float3 LightVecw;
-    float1 Time;
+    float Time;
     
 
     
@@ -76,12 +77,12 @@ VS_OUTPUT VS( float4 Pos : POSITION, float3 normal: NORMAL, float2 Tex : TEXCOOR
 //--------------------------------------------------------------------------------------
 float4 PS( VS_OUTPUT input ) : SV_Target
 {
-    float3 toEye = normalize(EyePosW - input.PosW);
+    float3 toEye = normalize(EyePosW - input.PosW.xyz);
     input.Normal = normalize(input.Normal);
     //compute color 
     float4 textureColor = txDiffuse.Sample(samLinear, input.Tex);
     float diffuseAmount = max(dot(LightVecw, input.Normal), 0.0f);
-    float3 diffuse = diffuseAmount * (textureColor * DiffuseLight).rgb;
+    float3 diffuse = (diffuseAmount * (DiffuseMaterial * DiffuseLight).rgb);
     float3 ambient = (AmbientLight * AmbientMaterial).rgb;
     float3 r = reflect(-LightVecw, input.Normal); //reflection vector
     //determine how much (if any) specular light makes it to the eye
@@ -89,7 +90,7 @@ float4 PS( VS_OUTPUT input ) : SV_Target
     float3 specular = specularAmount * (SpecularMaterial * SpecularLight).rgb;
 
     float4 color;
-    color.rgb = diffuse + ambient + specular;
+    color.rgb = (diffuse + ambient + specular) * textureColor.rgb;
     color.a = DiffuseMaterial.a;
     return color;
 }
