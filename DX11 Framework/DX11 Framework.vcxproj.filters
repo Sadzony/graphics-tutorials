@@ -35,6 +35,9 @@
     <ClInclude Include="Structures.h">
       <Filter>header files</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>header files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -47,6 +50,9 @@
       <Filter>class files</Filter>
     </ClCompile>
     <ClCompile Include="OBJLoader.cpp">
+      <Filter>class files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
       <Filter>class files</Filter>
     </ClCompile>
   </ItemGroup>

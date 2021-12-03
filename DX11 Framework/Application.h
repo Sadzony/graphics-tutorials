@@ -9,6 +9,7 @@
 #include "DDSTextureLoader.h"
 #include "Structures.h"
 #include "OBJLoader.h"
+#include "Camera.h"
 using namespace DirectX;
 
 struct ConstantBuffer
@@ -58,8 +59,8 @@ private:
 	ID3D11Buffer*			_plIndexBuffer;
 	ID3D11Buffer*           _pConstantBuffer;
 	XMFLOAT4X4              _world;
-	XMFLOAT4X4              _view;
-	XMFLOAT4X4              _projection;
+
+	Camera* _camera;
 
 	//light objects
 	XMFLOAT3 lightDirection;
@@ -97,8 +98,6 @@ private:
 
 	UINT _WindowHeight;
 	UINT _WindowWidth;
-
-	void CalculateVertexNormals(ID3D11Buffer* vertexBuffer, ID3D11Buffer* indexBuffer, int numberOfVertices, int numberOfIndices);
 
 public:
 	Application();

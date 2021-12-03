@@ -3,5 +3,13 @@ C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application
 C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(26,101): warning C4100: 'vertexArraySize': unreferenced formal parameter
 C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(26,84): warning C4100: 'indexBuffer': unreferenced formal parameter
 C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(26,56): warning C4100: 'vertexBuffer': unreferenced formal parameter
+C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(143,51): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
+C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(143,37): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
+C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(820): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(821): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(820,50): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(821,62): warning C4238: nonstandard extension used: class rvalue used as lvalue
+  DX11 Framework.cpp
+  Generating Code...
 Application.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
   DX11 Framework.vcxproj -> C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Debug\DX11 Framework.exe
