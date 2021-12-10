@@ -60,7 +60,8 @@ private:
 	ID3D11Buffer*           _pConstantBuffer;
 	XMFLOAT4X4              _world;
 
-	Camera* _camera;
+	Camera* cameras[2];
+	int currentCameraIndex = 0;
 
 	//light objects
 	XMFLOAT3 lightDirection;

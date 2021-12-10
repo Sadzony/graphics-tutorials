@@ -70,13 +70,14 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	XMStoreFloat4x4(&_world, XMMatrixIdentity());
 
     // Initialize the camera
-    
-	XMFLOAT3 Eye = XMFLOAT3(0.0f, 7.0f, -3.0f);
-	XMFLOAT3 At = XMFLOAT3(0.0f, 0.0f, 7.5f);
-	XMFLOAT3 Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+    XMFLOAT3 Eye = XMFLOAT3(2.5f, 10.0f, 7.5f);
+    XMFLOAT3 At = XMFLOAT3(0.0f, 0.0f, 7.5f);
+    XMFLOAT3 Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+    cameras[0] = new Camera(Eye,At,Up, _WindowWidth, _WindowHeight, 0.01f, 100.0f);
 
-    _camera = new Camera(Eye,At,Up, _WindowWidth, _WindowHeight, 0.01f, 100.0f);
-
+    Eye = XMFLOAT3(0.0f, -1.0f, -3.0f);
+    Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+    cameras[1] = new Camera(Eye, Up, _WindowWidth, _WindowHeight, 0.01f, 100.0f);
 	
 
     //load texture
@@ -701,8 +702,7 @@ void Application::Update()
     //send time to constant buffer
     updateTime = t;
 
-    //update camera
-    _camera->Update();
+    
 
     //
     // Animate the sun
@@ -737,6 +737,25 @@ void Application::Update()
         _RKeyPressed = false;
     }
 
+    if (GetAsyncKeyState(0x31)) {
+        if (currentCameraIndex == 1) {
+            currentCameraIndex = 0;
+        }
+    }
+    if (GetAsyncKeyState(0x32)) {
+        if (currentCameraIndex == 0) {
+            currentCameraIndex = 1;
+        }
+    }
+    XMVECTOR planetPosVec;
+    XMVECTOR planetRotVec;
+    XMVECTOR planetScaleVec;
+    XMMatrixDecompose(&planetScaleVec, &planetRotVec, &planetPosVec, XMLoadFloat4x4(&_planet1WorldPos));
+    XMFLOAT3 planetPosFloat3;
+    XMStoreFloat3(&planetPosFloat3, planetPosVec);
+    cameras[0]->SetAt(planetPosFloat3);
+    //update camera
+    cameras[currentCameraIndex]->Update();
 
 
 }
@@ -752,8 +771,8 @@ void Application::Draw()
     _pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	XMMATRIX world = XMLoadFloat4x4(&_sunWorldPos);
-	XMMATRIX view = XMLoadFloat4x4(&_camera->GetView());
-	XMMATRIX projection = XMLoadFloat4x4(&_camera->GetProjection());
+	XMMATRIX view = XMLoadFloat4x4(&cameras[currentCameraIndex]->GetView());
+	XMMATRIX projection = XMLoadFloat4x4(&cameras[currentCameraIndex]->GetProjection());
     //
     // Update variables
     //
@@ -768,7 +787,7 @@ void Application::Draw()
     cb.SpecularLight = specularLight;
     cb.SpecularMaterial = specularMaterial;
     cb.SpecularPower = specularPower;
-    cb.EyePosW = _camera->GetPos();
+    cb.EyePosW = cameras[currentCameraIndex]->GetPos();
     
     cb.LightVecw = lightDirection;
     cb.gTime = updateTime;

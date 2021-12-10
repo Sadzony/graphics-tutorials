@@ -9,6 +9,7 @@ Camera::Camera(XMFLOAT3 position, XMFLOAT3 at, XMFLOAT3 up, float windowWidth, f
 	_windowHeight = windowHeight;
 	_nearDepth = nearDepth;
 	_farDepth = farDepth;
+	m_Type = CameraType::LookAt;
 	XMVECTOR eyeVec = XMVectorSet(_eye.x, _eye.y, _eye.z, 0.0f);
 	XMVECTOR atVec = XMVectorSet(_at.x, _at.y, _at.z, 0.0f);
 	XMVECTOR upVec = XMVectorSet(_up.x, _up.y, _up.z, 0.0f);
@@ -16,12 +17,35 @@ Camera::Camera(XMFLOAT3 position, XMFLOAT3 at, XMFLOAT3 up, float windowWidth, f
 	XMStoreFloat4x4(&_projection, XMMatrixPerspectiveFovLH(XM_PIDIV2, _windowWidth / (FLOAT)_windowHeight, _nearDepth , _farDepth));
 }
 
+Camera::Camera(XMFLOAT3 position, XMFLOAT3 up, float windowWidth, float windowHeight, float nearDepth, float farDepth)
+{
+	_eye = position;
+	_up = up;
+	_windowWidth = windowWidth;
+	_windowHeight = windowHeight;
+	_nearDepth = nearDepth;
+	_farDepth = farDepth;
+	m_Type = CameraType::LookTo;
+	XMVECTOR eyeVec = XMVectorSet(_eye.x, _eye.y, _eye.z, 0.0f);
+	XMVECTOR upVec = XMVectorSet(_up.x, _up.y, _up.z, 0.0f);
+	_forward = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	XMVECTOR forwardVec = XMVectorSet(_forward.x, _forward.y, _forward.z, 0.0f);
+	XMStoreFloat4x4(&_view, XMMatrixLookToLH(eyeVec, forwardVec, upVec));
+	XMStoreFloat4x4(&_projection, XMMatrixPerspectiveFovLH(XM_PIDIV2, _windowWidth / (FLOAT)_windowHeight, _nearDepth, _farDepth));
+}
+
 void Camera::Update()
 {
 	XMVECTOR eyeVec = XMVectorSet(_eye.x, _eye.y, _eye.z, 0.0f);
-	XMVECTOR atVec = XMVectorSet(_at.x, _at.y, _at.z, 0.0f);
 	XMVECTOR upVec = XMVectorSet(_up.x, _up.y, _up.z, 0.0f);
-	XMStoreFloat4x4(&_view, XMMatrixLookAtLH(eyeVec, atVec, upVec));
+	if (m_Type == CameraType::LookAt) {
+		XMVECTOR atVec = XMVectorSet(_at.x, _at.y, _at.z, 0.0f);
+		XMStoreFloat4x4(&_view, XMMatrixLookAtLH(eyeVec, atVec, upVec));
+	}
+	else if (m_Type == CameraType::LookTo) {
+		XMVECTOR forwardVec = XMVectorSet(_forward.x, _forward.y, _forward.z, 0.0f);
+		XMStoreFloat4x4(&_view, XMMatrixLookToLH(eyeVec, forwardVec, upVec));
+	}
 }
 
 void Camera::SetPos(XMFLOAT3 newPos)
@@ -39,6 +63,16 @@ void Camera::SetUp(XMFLOAT3 newUp)
 	_up = newUp;
 }
 
+void Camera::SetForward(XMFLOAT3 newForward)
+{
+	_forward = newForward;
+}
+
+void Camera::SetType(CameraType newType)
+{
+	m_Type = newType;
+}
+
 XMFLOAT3 Camera::GetPos()
 {
 	return _eye;
@@ -52,6 +86,11 @@ XMFLOAT3 Camera::GetAt()
 XMFLOAT3 Camera::GetUp()
 {
 	return _up;
+}
+
+XMFLOAT3 Camera::GetForward()
+{
+	return _forward;
 }
 
 XMFLOAT4X4 Camera::GetView()
