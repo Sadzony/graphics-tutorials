@@ -5,6 +5,7 @@
 #include <directxcolors.h>
 #include "resource.h"
 #include <vector>
+#define CAMERA_SPEED 10.0f
 using namespace DirectX;
 struct SimpleVertex
 {

@@ -700,8 +700,9 @@ void Application::Update()
         t = (dwTimeCur - dwTimeStart) / 1000.0f;
     }
     //send time to constant buffer
+    float lastUpdate = updateTime;
     updateTime = t;
-
+    float deltaTime = updateTime - lastUpdate;
     
 
     //
@@ -722,7 +723,14 @@ void Application::Update()
     //place the plane
     XMStoreFloat4x4(&_planeWorldPos, XMMatrixScaling(10.0f, 10.0f, 10.0f) * XMMatrixTranslation(0.0f, -3.0f, 7.5f));
 
-    if (GetAsyncKeyState(0x52) && _RKeyPressed == false) {
+    XMVECTOR sunPosVec;
+    XMVECTOR sunRotVec;
+    XMVECTOR sunScaleVec;
+    XMMatrixDecompose(&sunScaleVec, &sunRotVec, &sunPosVec, XMLoadFloat4x4(&_sunWorldPos));
+    XMFLOAT3 sunPosFloat3;
+    XMStoreFloat3(&sunPosFloat3, sunPosVec);
+    cameras[0]->SetAt(sunPosFloat3);
+    if (GetAsyncKeyState(0x52) && _RKeyPressed == false) { //changing rasterizer states
         _RKeyPressed = true;
         if (_currentState == 's') {
             _pImmediateContext->RSSetState(_wireFrame);
@@ -737,7 +745,7 @@ void Application::Update()
         _RKeyPressed = false;
     }
 
-    if (GetAsyncKeyState(0x31)) {
+    if (GetAsyncKeyState(0x31)) {  //changing cameras
         if (currentCameraIndex == 1) {
             currentCameraIndex = 0;
         }
@@ -747,13 +755,61 @@ void Application::Update()
             currentCameraIndex = 1;
         }
     }
-    XMVECTOR planetPosVec;
-    XMVECTOR planetRotVec;
-    XMVECTOR planetScaleVec;
-    XMMatrixDecompose(&planetScaleVec, &planetRotVec, &planetPosVec, XMLoadFloat4x4(&_planet1WorldPos));
-    XMFLOAT3 planetPosFloat3;
-    XMStoreFloat3(&planetPosFloat3, planetPosVec);
-    cameras[0]->SetAt(planetPosFloat3);
+    if (GetAsyncKeyState(0x57)) { //w key
+        if (currentCameraIndex == 1) { //if look to camera then move forward
+            XMFLOAT3 curPos = cameras[1]->GetPos();
+            XMVECTOR newPosVec = XMVectorSet(curPos.x, curPos.y, curPos.z + (CAMERA_SPEED * deltaTime), 0);
+            XMFLOAT3 newPos;
+            XMStoreFloat3(&newPos, newPosVec);
+            cameras[1]->SetPos(newPos);
+        }
+        else if (currentCameraIndex == 0) { //if look at camera then zoom in
+            XMFLOAT3 curPos = cameras[0]->GetPos();
+            XMVECTOR dir = XMVectorSet(sunPosFloat3.x - curPos.x, sunPosFloat3.y - curPos.x, sunPosFloat3.z - curPos.z, 0);
+            XMVECTOR lengthVec = XMVector3Length(dir);
+            float distance = 0.0f;
+            XMStoreFloat(&distance, lengthVec);
+            dir = XMVector3Normalize(dir);
+            if (distance > 0.5f) {
+                XMVECTOR curPosVec = XMVectorSet(curPos.x, curPos.y, curPos.z, 0);
+                XMVECTOR newPosVec = curPosVec + (dir * CAMERA_SPEED * deltaTime);
+                XMFLOAT3 newPos;
+                XMStoreFloat3(&newPos, newPosVec);
+                cameras[0]->SetPos(newPos);
+            }
+            else {
+                
+            }
+        }
+    }
+    if (GetAsyncKeyState(0x53)) { //s key
+        if (currentCameraIndex == 1) { //if look to camera then move backwards
+            XMFLOAT3 curPos = cameras[1]->GetPos();
+            XMVECTOR newPosVec = XMVectorSet(curPos.x, curPos.y, curPos.z - (CAMERA_SPEED* deltaTime), 0);
+            XMFLOAT3 newPos;
+            XMStoreFloat3(&newPos, newPosVec);
+            cameras[1]->SetPos(newPos);
+        }
+        else if (currentCameraIndex == 0) { //if look at camera then zoom out
+            XMFLOAT3 curPos = cameras[0]->GetPos();
+            XMVECTOR dir = XMVectorSet(sunPosFloat3.x - curPos.x, sunPosFloat3.y - curPos.x, sunPosFloat3.z - curPos.z, 0);
+            XMVECTOR lengthVec = XMVector3Length(dir);
+            float distance = 0.0f;
+            XMStoreFloat(&distance, lengthVec);
+            dir = XMVector3Normalize(dir);
+            if (distance > 0.5f) {
+                XMVECTOR curPosVec = XMVectorSet(curPos.x, curPos.y, curPos.z, 0);
+                XMVECTOR newPosVec = curPosVec - (dir * CAMERA_SPEED * deltaTime);
+                XMFLOAT3 newPos;
+                XMStoreFloat3(&newPos, newPosVec);
+                cameras[0]->SetPos(newPos);
+            }
+            else {
+                
+            }
+        }
+    }
+
     //update camera
     cameras[currentCameraIndex]->Update();
 

@@ -1,10 +1,10 @@
 ﻿  Application.cpp
-C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(76,54): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
-C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(76,40): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
-C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(80,52): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
-C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(80,38): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
-C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(774): warning C4238: nonstandard extension used: class rvalue used as lvalue
-C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(775): warning C4238: nonstandard extension used: class rvalue used as lvalue
-C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(774,70): warning C4238: nonstandard extension used: class rvalue used as lvalue
-C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Application.cpp(775,82): warning C4238: nonstandard extension used: class rvalue used as lvalue
-  DX11 Framework.vcxproj -> C:\Users\s011308k\Documents\GitHub\graphics-tutorials\DX11 Framework\Debug\DX11 Framework.exe
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(76,54): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(76,40): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(80,52): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(80,38): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(830): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(831): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(830,70): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(831,82): warning C4238: nonstandard extension used: class rvalue used as lvalue
+  DX11 Framework.vcxproj -> C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Debug\DX11 Framework.exe
