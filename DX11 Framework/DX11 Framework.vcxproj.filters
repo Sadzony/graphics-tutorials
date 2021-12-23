@@ -9,9 +9,6 @@
       <UniqueIdentifier>{2c3d4c8c-5d1a-459a-a05a-a4e4b608a44e}</UniqueIdentifier>
       <Extensions>fx;fxh;hlsl</Extensions>
     </Filter>
-    <Filter Include="class files">
-      <UniqueIdentifier>{eaf4b275-c869-4e41-8491-eab596a50054}</UniqueIdentifier>
-    </Filter>
     <Filter Include="header files">
       <UniqueIdentifier>{fc8ea98f-a819-4c8a-8225-3661f44affc9}</UniqueIdentifier>
     </Filter>
@@ -20,6 +17,9 @@
     </Filter>
     <Filter Include="DDS Files">
       <UniqueIdentifier>{561bfc87-6384-4a33-99da-acac8a6d10e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source files">
+      <UniqueIdentifier>{eaf4b275-c869-4e41-8491-eab596a50054}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -38,22 +38,28 @@
     <ClInclude Include="Camera.h">
       <Filter>header files</Filter>
     </ClInclude>
+    <ClInclude Include="Globals.h">
+      <Filter>header files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
-      <Filter>class files</Filter>
+      <Filter>source files</Filter>
     </ClCompile>
     <ClCompile Include="DX11 Framework.cpp">
-      <Filter>class files</Filter>
+      <Filter>source files</Filter>
     </ClCompile>
     <ClCompile Include="DDSTextureLoader.cpp">
-      <Filter>class files</Filter>
+      <Filter>source files</Filter>
     </ClCompile>
     <ClCompile Include="OBJLoader.cpp">
-      <Filter>class files</Filter>
+      <Filter>source files</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
-      <Filter>class files</Filter>
+      <Filter>source files</Filter>
+    </ClCompile>
+    <ClCompile Include="Globals.cpp">
+      <Filter>source files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

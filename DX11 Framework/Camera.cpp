@@ -34,8 +34,66 @@ Camera::Camera(XMFLOAT3 position, XMFLOAT3 up, float windowWidth, float windowHe
 	XMStoreFloat4x4(&_projection, XMMatrixPerspectiveFovLH(XM_PIDIV2, _windowWidth / (FLOAT)_windowHeight, _nearDepth, _farDepth));
 }
 
-void Camera::Update()
+void Camera::Update(float deltaTime)
 {
+	if (!isLerping) {
+		if (GetAsyncKeyState(0x57)) { //w key
+			if (m_Type == CameraType::LookTo) { //if look to camera then move forward
+				XMVECTOR forward = XMVectorSet(0, 0, 1, 0);
+				MoveDirection(forward, deltaTime);
+			}
+			else if (m_Type == CameraType::LookAt) { //if look at camera then zoom in
+
+				//find direction
+				XMVECTOR dir = XMVectorSet(_at.x - _eye.x, _at.y - _eye.y, _at.z - _eye.z, 0);
+				dir = XMVector3Normalize(dir);
+
+
+				//calculate distance after zoom
+				XMVECTOR curPosVec = XMVectorSet(_eye.x, _eye.y, _eye.z, 0);
+				XMVECTOR newPosVec = curPosVec + (dir * CAMERA_SPEED * deltaTime);
+				XMVECTOR atVector = XMVectorSet(_at.x, _at.y, _at.z, 0);
+				XMVECTOR newDistance = atVector - newPosVec;
+				XMVECTOR lengthVec = XMVector3Length(newDistance);
+				float distance = 0.0f;
+				XMStoreFloat(&distance, lengthVec);
+				if (distance > 2.0f) {
+					MoveDirection(dir, deltaTime);
+				}
+			}
+		}
+		else if (GetAsyncKeyState(0x53)) { //s key
+			if (m_Type == CameraType::LookTo) { //if look to camera then move backwards
+				XMVECTOR back = XMVectorSet(0, 0, -1, 0);
+				MoveDirection(back, deltaTime);
+			}
+			else if (m_Type == CameraType::LookAt) { //if look at camera then zoom out
+				XMVECTOR dir = XMVectorSet(_at.x - _eye.x, _at.y - _eye.y, _at.z - _eye.z, 0);
+				dir = XMVector3Normalize(-dir);
+				MoveDirection(dir, deltaTime);
+			}
+		}
+
+		if (GetAsyncKeyState(0x41)) { //A key
+			if (m_Type == CameraType::LookTo) { //if look to camera then move left
+				XMVECTOR left = XMVectorSet(-1, 0, 0, 0);
+				MoveDirection(left, deltaTime);
+			}
+			else if (m_Type == CameraType::LookAt) {
+				RotateY(_at, CAMERA_ROTATE_SPEED * deltaTime);
+			}
+		}
+
+		else if (GetAsyncKeyState(0x44)) { //D Key
+			if (m_Type == CameraType::LookTo) { //if look to camera then move right
+				XMVECTOR right = XMVectorSet(1, 0, 0, 0);
+				MoveDirection(right, deltaTime);
+			}
+			else if (m_Type == CameraType::LookAt) {
+				RotateY(_at, -CAMERA_ROTATE_SPEED * deltaTime);
+			}
+		}
+	}
 	XMVECTOR eyeVec = XMVectorSet(_eye.x, _eye.y, _eye.z, 0.0f);
 	XMVECTOR upVec = XMVectorSet(_up.x, _up.y, _up.z, 0.0f);
 	if (m_Type == CameraType::LookAt) {
@@ -71,6 +129,66 @@ void Camera::SetForward(XMFLOAT3 newForward)
 void Camera::SetType(CameraType newType)
 {
 	m_Type = newType;
+}
+
+void Camera::MoveDirection(XMVECTOR direction, float deltaTime)
+{
+	XMVECTOR curPosVec = XMVectorSet(_eye.x, _eye.y, _eye.z, 0);
+	XMVECTOR newPosVec = curPosVec + (direction * CAMERA_SPEED * deltaTime);
+	XMFLOAT3 newPos;
+	XMStoreFloat3(&newPos, newPosVec);
+	SetPos(newPos);
+}
+
+bool Camera::LerpToPosition(XMFLOAT3 lerpPos, float deltaTime, float secondsToLerp)
+{
+	if (!isLerping) {
+		lerpStartPos = _eye;
+		isLerping = true;
+	}
+	_lerpElapsedTime += deltaTime;
+	float lerpFactor = _lerpElapsedTime / secondsToLerp;
+	float x = MathFunction::lerp(lerpStartPos.x, lerpPos.x, lerpFactor);
+	float y = MathFunction::lerp(lerpStartPos.y, lerpPos.y, lerpFactor);
+	float z = MathFunction::lerp(lerpStartPos.z, lerpPos.z, lerpFactor);
+	XMFLOAT3 nextPos = XMFLOAT3(x, y, z);
+	SetPos(nextPos);
+	if (lerpFactor <= 1) {
+		return false;
+	}
+	else if (lerpFactor > 1) {
+		isLerping = false;
+		_lerpElapsedTime = 0;
+		return true;
+	}
+	
+}
+
+int Camera::LerpThroughPositions(std::vector<XMFLOAT3>& listOfPositions, float deltaTime, float secondsPerPos)
+{
+	if (_lerpCurrentListPosition < listOfPositions.size()) {
+		if (LerpToPosition(listOfPositions.at(_lerpCurrentListPosition), deltaTime, secondsPerPos)) {
+			_lerpCurrentListPosition++;
+		}
+	}
+	if (_lerpCurrentListPosition >= listOfPositions.size()) {
+		_lerpCurrentListPosition = 0;
+		return listOfPositions.size();
+	}
+	return _lerpCurrentListPosition;
+}
+
+void Camera::RotateY(XMFLOAT3 center, float rotationFactor)
+{
+	XMFLOAT4X4 cameraWorldPos;
+	XMStoreFloat4x4(&cameraWorldPos,  XMMatrixTranslation(_eye.x-center.x, _eye.y - center.y, _eye.z - center.z) * XMMatrixRotationY(rotationFactor) * XMMatrixTranslation(center.x, center.y, center.z));
+	XMVECTOR PosVec;
+	XMVECTOR RotVec;
+	XMVECTOR ScaleVec;
+	XMMatrixDecompose(&ScaleVec, &RotVec, &PosVec, XMLoadFloat4x4(&cameraWorldPos));
+	XMFLOAT3 PosFloat3;
+	XMStoreFloat3(&PosFloat3, PosVec);
+	SetPos(PosFloat3);
 }
 
 XMFLOAT3 Camera::GetPos()

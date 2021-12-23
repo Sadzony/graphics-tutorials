@@ -8,6 +8,7 @@
 #include <vector>
 #include "DDSTextureLoader.h"
 #include "Structures.h"
+#include "Globals.h"
 #include "OBJLoader.h"
 #include "Camera.h"
 using namespace DirectX;
@@ -31,6 +32,8 @@ struct ConstantBuffer
 
 	XMFLOAT3 LightVecw;
 	float gTime;
+
+
 
 };
 
@@ -62,6 +65,8 @@ private:
 
 	Camera* cameras[2];
 	int currentCameraIndex = 0;
+	bool lerpResult = false;
+	std::vector<XMFLOAT3> lerpPositions;
 
 	//light objects
 	XMFLOAT3 lightDirection;
@@ -87,7 +92,7 @@ private:
 	ID3D11Texture2D* _depthStencilBuffer;
 
 	bool _RKeyPressed = false;
-	float updateTime;
+	float updateTime = 0;
 private:
 	HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
 	HRESULT InitDevice();

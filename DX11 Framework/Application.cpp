@@ -78,7 +78,12 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
     Eye = XMFLOAT3(0.0f, -1.0f, -3.0f);
     Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
     cameras[1] = new Camera(Eye, Up, _WindowWidth, _WindowHeight, 0.01f, 100.0f);
-	
+    XMFLOAT3 lerpPos1 = XMFLOAT3(10.0f, 10.0f, 15.0f);
+    XMFLOAT3 lerpPos2 = XMFLOAT3(10.0f, 20.0f, 15.0f);
+    XMFLOAT3 lerpPos3 = XMFLOAT3(2.5f, 10.0f, 7.5f);
+    lerpPositions.push_back(lerpPos1);
+    lerpPositions.push_back(lerpPos2);
+    lerpPositions.push_back(lerpPos3);
 
     //load texture
     HRESULT hr = CreateDDSTextureFromFile(_pd3dDevice, L"Crate_COLOR.dds", nullptr, &_pTextureRV);
@@ -755,63 +760,15 @@ void Application::Update()
             currentCameraIndex = 1;
         }
     }
-    if (GetAsyncKeyState(0x57)) { //w key
-        if (currentCameraIndex == 1) { //if look to camera then move forward
-            XMFLOAT3 curPos = cameras[1]->GetPos();
-            XMVECTOR newPosVec = XMVectorSet(curPos.x, curPos.y, curPos.z + (CAMERA_SPEED * deltaTime), 0);
-            XMFLOAT3 newPos;
-            XMStoreFloat3(&newPos, newPosVec);
-            cameras[1]->SetPos(newPos);
+    if (lerpResult == false) {
+        int curIndex = cameras[0]->LerpThroughPositions(lerpPositions, deltaTime, 5.0f);
+        if (curIndex == lerpPositions.size()) {
+            lerpResult = true;
         }
-        else if (currentCameraIndex == 0) { //if look at camera then zoom in
-            XMFLOAT3 curPos = cameras[0]->GetPos();
-            XMVECTOR dir = XMVectorSet(sunPosFloat3.x - curPos.x, sunPosFloat3.y - curPos.x, sunPosFloat3.z - curPos.z, 0);
-            XMVECTOR lengthVec = XMVector3Length(dir);
-            float distance = 0.0f;
-            XMStoreFloat(&distance, lengthVec);
-            dir = XMVector3Normalize(dir);
-            if (distance > 0.5f) {
-                XMVECTOR curPosVec = XMVectorSet(curPos.x, curPos.y, curPos.z, 0);
-                XMVECTOR newPosVec = curPosVec + (dir * CAMERA_SPEED * deltaTime);
-                XMFLOAT3 newPos;
-                XMStoreFloat3(&newPos, newPosVec);
-                cameras[0]->SetPos(newPos);
-            }
-            else {
-                
-            }
-        }
-    }
-    if (GetAsyncKeyState(0x53)) { //s key
-        if (currentCameraIndex == 1) { //if look to camera then move backwards
-            XMFLOAT3 curPos = cameras[1]->GetPos();
-            XMVECTOR newPosVec = XMVectorSet(curPos.x, curPos.y, curPos.z - (CAMERA_SPEED* deltaTime), 0);
-            XMFLOAT3 newPos;
-            XMStoreFloat3(&newPos, newPosVec);
-            cameras[1]->SetPos(newPos);
-        }
-        else if (currentCameraIndex == 0) { //if look at camera then zoom out
-            XMFLOAT3 curPos = cameras[0]->GetPos();
-            XMVECTOR dir = XMVectorSet(sunPosFloat3.x - curPos.x, sunPosFloat3.y - curPos.x, sunPosFloat3.z - curPos.z, 0);
-            XMVECTOR lengthVec = XMVector3Length(dir);
-            float distance = 0.0f;
-            XMStoreFloat(&distance, lengthVec);
-            dir = XMVector3Normalize(dir);
-            if (distance > 0.5f) {
-                XMVECTOR curPosVec = XMVectorSet(curPos.x, curPos.y, curPos.z, 0);
-                XMVECTOR newPosVec = curPosVec - (dir * CAMERA_SPEED * deltaTime);
-                XMFLOAT3 newPos;
-                XMStoreFloat3(&newPos, newPosVec);
-                cameras[0]->SetPos(newPos);
-            }
-            else {
-                
-            }
-        }
-    }
 
+    }
     //update camera
-    cameras[currentCameraIndex]->Update();
+    cameras[currentCameraIndex]->Update(deltaTime);
 
 
 }
