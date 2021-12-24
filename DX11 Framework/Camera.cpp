@@ -206,6 +206,7 @@ XMFLOAT3 Camera::GetUp()
 	return _up;
 }
 
+
 XMFLOAT3 Camera::GetForward()
 {
 	return _forward;

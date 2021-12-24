@@ -378,6 +378,7 @@
     <Image Include="Crate_NRM.dds" />
     <Image Include="Crate_SPEC.dds" />
     <Image Include="Hercules_COLOR.dds" />
+    <Image Include="Pine Tree.dds" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />

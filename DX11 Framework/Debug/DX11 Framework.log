@@ -3,15 +3,11 @@ C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Applicatio
 C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(76,40): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
 C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(80,52): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
 C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(80,38): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(765,22): warning C4389: '==': signed/unsigned mismatch
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(787): warning C4238: nonstandard extension used: class rvalue used as lvalue
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(788): warning C4238: nonstandard extension used: class rvalue used as lvalue
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(787,70): warning C4238: nonstandard extension used: class rvalue used as lvalue
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(788,82): warning C4238: nonstandard extension used: class rvalue used as lvalue
-  Camera.cpp
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Camera.cpp(169,31): warning C4018: '<': signed/unsigned mismatch
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Camera.cpp(174,31): warning C4018: '>=': signed/unsigned mismatch
-  Generating Code...
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Camera.cpp(165): warning C4715: 'Camera::LerpToPosition': not all control paths return a value
-Application.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(789,22): warning C4389: '==': signed/unsigned mismatch
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(808): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(808,79): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(830): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(831): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(830,70): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(831,82): warning C4238: nonstandard extension used: class rvalue used as lvalue
   DX11 Framework.vcxproj -> C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Debug\DX11 Framework.exe

@@ -90,5 +90,8 @@
     <Image Include="Hercules_COLOR.dds">
       <Filter>DDS Files</Filter>
     </Image>
+    <Image Include="Pine Tree.dds">
+      <Filter>DDS Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

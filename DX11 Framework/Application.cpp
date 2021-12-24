@@ -89,6 +89,9 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
     HRESULT hr = CreateDDSTextureFromFile(_pd3dDevice, L"Crate_COLOR.dds", nullptr, &_pTextureRV);
     if (FAILED(hr))
         return hr;
+    hr = CreateDDSTextureFromFile(_pd3dDevice, L"Pine Tree.dds", nullptr, &_pTextureTree);
+    if (FAILED(hr))
+        return hr;
     //define sampler
     D3D11_SAMPLER_DESC sampDesc;
     ZeroMemory(&sampDesc, sizeof(sampDesc));
@@ -185,10 +188,10 @@ HRESULT Application::InitVertexBuffer()
         { XMFLOAT3( -1.0f, -1.0f, -1.0f),   XMFLOAT3(-0.408248f, -0.408248f, -0.816497f),   XMFLOAT2(0.0f,0.0f) },
         { XMFLOAT3( 1.0f, -1.0f, -1.0f),    XMFLOAT3(0.666667f, -0.666667f, -0.333333),     XMFLOAT2(1.0f,0.0f) },
 
-        { XMFLOAT3(-1.0f, 1.0f, 1.0f),  XMFLOAT3(-0.333333f, 0.666667f, 0.666667f),  XMFLOAT2(0.0f,1.0f) },
-        { XMFLOAT3(1.0f, 1.0f, 1.0f),   XMFLOAT3(0.816497f, 0.408248f, 0.408248f),   XMFLOAT2(1.0f,1.0f) },
-        { XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT3(-0.666667f, -0.666667f, 0.333333f), XMFLOAT2(0.0f,0.0f) },
-        { XMFLOAT3(1.0f, -1.0f, 1.0f),  XMFLOAT3(0.408248f, -0.408248f, 0.816497f),  XMFLOAT2(1.0f,0.0f) },
+        { XMFLOAT3(-1.0f, 1.0f, 1.0f),      XMFLOAT3(-0.333333f, 0.666667f, 0.666667f),         XMFLOAT2(0.0f,1.0f) },
+        { XMFLOAT3(1.0f, 1.0f, 1.0f),       XMFLOAT3(0.816497f, 0.408248f, 0.408248f),           XMFLOAT2(1.0f,1.0f) },
+        { XMFLOAT3(-1.0f, -1.0f, 1.0f),     XMFLOAT3(-0.666667f, -0.666667f, 0.333333f),      XMFLOAT2(0.0f,0.0f) },
+        { XMFLOAT3(1.0f, -1.0f, 1.0f),      XMFLOAT3(0.408248f, -0.408248f, 0.816497f),       XMFLOAT2(1.0f,0.0f) },
     };
 
     D3D11_BUFFER_DESC cvb;
@@ -234,23 +237,23 @@ HRESULT Application::InitVertexBuffer()
 
     SimpleVertex planeVertices[] =
     {
-        { XMFLOAT3(-2.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f ,1.0f)},
-        { XMFLOAT3(-1.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.25f,1.0f) },
-        { XMFLOAT3(0.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),   XMFLOAT2(0.5f ,1.0f) },
-        { XMFLOAT3(1.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),   XMFLOAT2(0.75f,1.0f) },
-        { XMFLOAT3(2.0f, 0.0f, 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),   XMFLOAT2(1.0f ,1.0f) },
+        { XMFLOAT3(-2.0f, 0.0f, 2.0f),  XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f ,1.0f)},
+        { XMFLOAT3(-1.0f, 0.0f, 2.0f),  XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.25f,1.0f) },
+        { XMFLOAT3(0.0f, 0.0f, 2.0f),   XMFLOAT3(0.0f, 1.0f, 0.0f),   XMFLOAT2(0.5f ,1.0f) },
+        { XMFLOAT3(1.0f, 0.0f, 2.0f),   XMFLOAT3(0.0f, 1.0f, 0.0f),   XMFLOAT2(0.75f,1.0f) },
+        { XMFLOAT3(2.0f, 0.0f, 2.0f),   XMFLOAT3(0.0f, 1.0f, 0.0f),   XMFLOAT2(1.0f ,1.0f) },
 
-        { XMFLOAT3(-2.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f ,0.75f) },
-        { XMFLOAT3(-1.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.25f,0.75f) },
-        { XMFLOAT3(0.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.5f ,0.75f) },
-        { XMFLOAT3(1.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.75f,0.75f) },
-        { XMFLOAT3(2.0f,  0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(1.0f ,0.75f) },
+        { XMFLOAT3(-2.0f, 0.0f, 1.0f),  XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f ,0.75f) },
+        { XMFLOAT3(-1.0f, 0.0f, 1.0f),  XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.25f,0.75f) },
+        { XMFLOAT3(0.0f,  0.0f, 1.0f),  XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.5f ,0.75f) },
+        { XMFLOAT3(1.0f,  0.0f, 1.0f),  XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.75f,0.75f) },
+        { XMFLOAT3(2.0f,  0.0f, 1.0f),  XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(1.0f ,0.75f) },
 
-        { XMFLOAT3(-2.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f ,0.5f) },
-        { XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.25f,0.5f) },
-        { XMFLOAT3(0.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.5f ,0.5f) },
-        { XMFLOAT3(1.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.75f,0.5f) },
-        { XMFLOAT3(2.0f,  0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(1.0f ,0.5f) },
+        { XMFLOAT3(-2.0f, 0.0f, 0.0f),  XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.0f ,0.5f) },
+        { XMFLOAT3(-1.0f, 0.0f, 0.0f),  XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.25f,0.5f) },
+        { XMFLOAT3(0.0f,  0.0f, 0.0f),  XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.5f ,0.5f) },
+        { XMFLOAT3(1.0f,  0.0f, 0.0f),  XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(0.75f,0.5f) },
+        { XMFLOAT3(2.0f,  0.0f, 0.0f),  XMFLOAT3(0.0f, 1.0f, 0.0f),  XMFLOAT2(1.0f ,0.5f) },
                          
         { XMFLOAT3(-2.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f ,0.25f) },
         { XMFLOAT3(-1.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.25f,0.25f) },
@@ -662,6 +665,25 @@ HRESULT Application::InitDevice()
     _pImmediateContext->RSSetState(_rasterizerSolid);
     _currentState = 's';
 
+    D3D11_BLEND_DESC blendDesc;
+    ZeroMemory(&blendDesc, sizeof(blendDesc));
+    D3D11_RENDER_TARGET_BLEND_DESC rtbd;
+    ZeroMemory(&rtbd, sizeof(rtbd));
+
+    rtbd.BlendEnable = true;
+    rtbd.SrcBlend = D3D11_BLEND_SRC_COLOR;
+    rtbd.DestBlend = D3D11_BLEND_BLEND_FACTOR;
+    rtbd.BlendOp = D3D11_BLEND_OP_ADD;
+    rtbd.SrcBlendAlpha = D3D11_BLEND_ONE;
+    rtbd.DestBlendAlpha = D3D11_BLEND_ZERO;
+    rtbd.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    rtbd.RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
+    blendDesc.AlphaToCoverageEnable = false;
+    blendDesc.RenderTarget[0] = rtbd;
+
+    hr = _pd3dDevice->CreateBlendState(&blendDesc, &Transparency);
+    if (FAILED(hr))
+        return hr;
 
     return S_OK;
 }
@@ -683,6 +705,9 @@ void Application::Cleanup()
     if (_depthStencilView) _depthStencilView->Release();
     if (_depthStencilBuffer) _depthStencilBuffer->Release();
     if (_wireFrame) _wireFrame->Release();
+    if (Transparency) Transparency->Release();
+    if (_pTextureRV) _pTextureRV->Release();
+    if (_pTextureTree) _pTextureTree->Release();
 }
 
 void Application::Update()
@@ -725,8 +750,7 @@ void Application::Update()
     XMStoreFloat4x4(&_moon1WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(1.2f, 0.0f, 0.0f) * XMMatrixRotationY(3 * t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f) * XMMatrixRotationY(-t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
     XMStoreFloat4x4(&_moon2WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(1.2f, 0.0f, 0.0f) * XMMatrixRotationY(5*t)* XMMatrixTranslation(8.5f, 0.0f, 0.0f) * XMMatrixRotationY(t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
 
-    //place the plane
-    XMStoreFloat4x4(&_planeWorldPos, XMMatrixScaling(10.0f, 10.0f, 10.0f) * XMMatrixTranslation(0.0f, -3.0f, 7.5f));
+
 
     XMVECTOR sunPosVec;
     XMVECTOR sunRotVec;
@@ -760,7 +784,7 @@ void Application::Update()
             currentCameraIndex = 1;
         }
     }
-    if (lerpResult == false) {
+    if (lerpResult == false && GetAsyncKeyState(0x4C)) {
         int curIndex = cameras[0]->LerpThroughPositions(lerpPositions, deltaTime, 5.0f);
         if (curIndex == lerpPositions.size()) {
             lerpResult = true;
@@ -770,7 +794,26 @@ void Application::Update()
     //update camera
     cameras[currentCameraIndex]->Update(deltaTime);
 
+    //find the angle between camera and plane
+    XMFLOAT3 planePos = XMFLOAT3(0.0, -3.0f, 7.5f);
+    XMVECTOR planeVec = XMVectorSet(planePos.x, planePos.y, planePos.z, 0.0f);
+    XMVECTOR eyeVec = XMVectorSet(cameras[currentCameraIndex]->GetPos().x, cameras[currentCameraIndex]->GetPos().y, cameras[currentCameraIndex]->GetPos().z, 0.0f);
+    XMVECTOR planeToEye = eyeVec - planeVec;
+    XMVECTOR planeNormal = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+    XMVECTOR angleVec = XMVector3AngleBetweenVectors(planeToEye, planeNormal);
+    float angle = 0.0f;
+    XMStoreFloat(&angle, angleVec);
 
+    //find the rotation axis
+    XMMATRIX cameraView = XMLoadFloat4x4(&cameras[currentCameraIndex]->GetView());
+    XMMATRIX cameraViewInverse = XMMatrixInverse(nullptr, cameraView);
+    XMVECTOR right = XMVectorSet(-1.0f, 0.0f, 0.0f, 1.0f);
+    XMVECTOR axis = XMVector3Transform(right, cameraViewInverse);
+    axis = XMVector3Normalize(axis);
+    XMFLOAT3 debugAxis;
+    XMStoreFloat3(&debugAxis, axis);
+    
+    XMStoreFloat4x4(&_planeWorldPos, XMMatrixRotationAxis(axis, 30) * XMMatrixScaling(10.0f, 10.0f, 10.0f)  * XMMatrixTranslation(0.0f, -3.0f, 7.5f) );
 }
 
 void Application::Draw()
@@ -786,6 +829,9 @@ void Application::Draw()
 	XMMATRIX world = XMLoadFloat4x4(&_sunWorldPos);
 	XMMATRIX view = XMLoadFloat4x4(&cameras[currentCameraIndex]->GetView());
 	XMMATRIX projection = XMLoadFloat4x4(&cameras[currentCameraIndex]->GetProjection());
+
+    float blendFactor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    _pImmediateContext->OMSetBlendState(0, 0, 0xffffffff);
     //
     // Update variables
     //
@@ -825,15 +871,13 @@ void Application::Draw()
     
     
     
+
+	//set texture
+    _pImmediateContext->PSSetShaderResources(0, 1, &_pTextureRV);
     //
     // Renders sun
     //
     _pImmediateContext->DrawIndexed(objMeshData.IndexCount, 0, 0);
-	//set texture
-    _pImmediateContext->PSSetShaderResources(0, 1, &_pTextureRV);
-    //change vertex and index buffer to cube
-    //_pImmediateContext->IASetVertexBuffers(0, 1, &_cVertexBuffer, &stride, &offset);
-    //_pImmediateContext->IASetIndexBuffer(_cIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
     
     //draw planet 1
@@ -867,12 +911,19 @@ void Application::Draw()
     _pImmediateContext->IASetVertexBuffers(0, 1, &_plVertexBuffer, &stride, &offset);
     _pImmediateContext->IASetIndexBuffer(_plIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
+
+    //after rendering opaque object, switch to transparency state
+    _pImmediateContext->OMSetBlendState(Transparency, blendFactor, 0xffffffff);
+
     //draw plane
+    _pImmediateContext->PSSetShaderResources(0, 1, &_pTextureTree);
     world = XMLoadFloat4x4(&_planeWorldPos);
     cb.mWorld = XMMatrixTranspose(world);
     _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
     
     _pImmediateContext->DrawIndexed(96, 0, 0);
+
+
 
     
     //
