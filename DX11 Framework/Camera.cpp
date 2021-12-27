@@ -30,6 +30,8 @@ Camera::Camera(XMFLOAT3 position, XMFLOAT3 up, float windowWidth, float windowHe
 	XMVECTOR upVec = XMVectorSet(_up.x, _up.y, _up.z, 0.0f);
 	_forward = XMFLOAT3(0.0f, 0.0f, 1.0f);
 	XMVECTOR forwardVec = XMVectorSet(_forward.x, _forward.y, _forward.z, 0.0f);
+	forwardVec = XMVector3Normalize(forwardVec);
+	XMStoreFloat3(&_forward, forwardVec);
 	XMStoreFloat4x4(&_view, XMMatrixLookToLH(eyeVec, forwardVec, upVec));
 	XMStoreFloat4x4(&_projection, XMMatrixPerspectiveFovLH(XM_PIDIV2, _windowWidth / (FLOAT)_windowHeight, _nearDepth, _farDepth));
 }

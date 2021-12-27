@@ -91,7 +91,7 @@ private:
 	ID3D11SamplerState* _pSamplerLinear = nullptr;
 
 	//world objects
-	XMFLOAT4X4              _sunWorldPos, _planet1WorldPos, _planet2WorldPos, _moon1WorldPos, _moon2WorldPos, _planeWorldPos;
+	XMFLOAT4X4              _sunWorldPos, _planet1WorldPos, _planet2WorldPos, _moon1WorldPos, _moon2WorldPos, _planeWorldPos, plane2WorldPos;
 	MeshData objMeshData;
 	//depth and stencil buffer
 	ID3D11DepthStencilView* _depthStencilView;
@@ -107,6 +107,8 @@ private:
 	HRESULT InitShadersAndInputLayout();
 	HRESULT InitVertexBuffer();
 	HRESULT InitIndexBuffer();
+
+	void BillboardObject(XMFLOAT4X4* objectWorldMat, XMFLOAT3 objectPos, XMFLOAT3 objectScale, XMFLOAT3 objectForward, XMFLOAT3 objectUp, Camera* camera);
 
 	UINT _WindowHeight;
 	UINT _WindowWidth;

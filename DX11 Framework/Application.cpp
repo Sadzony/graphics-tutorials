@@ -75,7 +75,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
     XMFLOAT3 Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
     cameras[0] = new Camera(Eye,At,Up, _WindowWidth, _WindowHeight, 0.01f, 100.0f);
 
-    Eye = XMFLOAT3(0.0f, -1.0f, -3.0f);
+    Eye = XMFLOAT3(0.0f, 20.0f, -3.0f);
     Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
     cameras[1] = new Camera(Eye, Up, _WindowWidth, _WindowHeight, 0.01f, 100.0f);
     XMFLOAT3 lerpPos1 = XMFLOAT3(10.0f, 10.0f, 15.0f);
@@ -431,6 +431,42 @@ HRESULT Application::InitIndexBuffer()
 	return S_OK;
 }
 
+void Application::BillboardObject(XMFLOAT4X4* objectWorldMat, XMFLOAT3 objectPos, XMFLOAT3 objectScale, XMFLOAT3 objectForward, XMFLOAT3 objectUp, Camera* camera)
+{
+    //find the angle for Y rotation
+    XMVECTOR objVec = XMVectorSet(objectPos.x, objectPos.y, objectPos.z, 0.0f);
+    XMVECTOR eyeVecNoY = XMVectorSet(camera->GetPos().x, objectPos.y, camera->GetPos().z, 0.0f);
+    XMVECTOR eyeToObj = eyeVecNoY - objVec;
+    XMVECTOR forward = XMVectorSet(objectForward.x, objectForward.y, objectForward.z, 0.0f);
+    XMVECTOR angleVec = XMVector3AngleBetweenVectors(eyeToObj, forward);
+    float angleY = 0.0f;
+    XMStoreFloat(&angleY, angleVec);
+
+    if (camera->GetPos().x < objectPos.x) {
+        angleY = -angleY;
+    }
+    //find angle for axis rotation
+    XMVECTOR eyeVec = XMVectorSet(camera->GetPos().x, camera->GetPos().y, camera->GetPos().z, 0.0f);
+    eyeToObj = eyeVec - objVec;
+    XMVECTOR objUpVec = XMVectorSet(objectUp.x, objectUp.y, objectUp.z, 0.0f);
+    angleVec = XMVector3AngleBetweenVectors(eyeToObj, objUpVec);
+    float angle = 0.0f;
+    XMStoreFloat(&angle, angleVec);
+    if (camera->GetPos().y < objectPos.y) {
+        angle = -angle;
+    }
+
+    //find the rotation axis
+    XMMATRIX cameraView = XMLoadFloat4x4(&camera->GetView());
+    XMMATRIX cameraWorld = XMMatrixInverse(nullptr, cameraView); //the inverse of the view is the world matrix
+    XMVECTOR right = XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f);
+    XMVECTOR axisPositionVector = XMVector3Transform(right, cameraWorld);
+    XMVECTOR axis = eyeVec- axisPositionVector;
+    axis = XMVector3Normalize(axis);
+
+    XMStoreFloat4x4(objectWorldMat, XMMatrixScaling(objectScale.x, objectScale.y, objectScale.z)  * XMMatrixRotationY(angleY) * XMMatrixRotationAxis(-axis, -angle) * XMMatrixTranslation(objectPos.x, objectPos.y, objectPos.z));
+}
+
 HRESULT Application::InitWindow(HINSTANCE hInstance, int nCmdShow)
 {
     // Register class
@@ -758,7 +794,7 @@ void Application::Update()
     XMMatrixDecompose(&sunScaleVec, &sunRotVec, &sunPosVec, XMLoadFloat4x4(&_sunWorldPos));
     XMFLOAT3 sunPosFloat3;
     XMStoreFloat3(&sunPosFloat3, sunPosVec);
-    cameras[0]->SetAt(sunPosFloat3);
+    //cameras[0]->SetAt(sunPosFloat3);
     if (GetAsyncKeyState(0x52) && _RKeyPressed == false) { //changing rasterizer states
         _RKeyPressed = true;
         if (_currentState == 's') {
@@ -793,27 +829,13 @@ void Application::Update()
     }
     //update camera
     cameras[currentCameraIndex]->Update(deltaTime);
+    XMFLOAT3 planePos = XMFLOAT3(0.0f, -5.0f, 25.0f);
+    XMFLOAT3 planeScale = XMFLOAT3(10.0f, 10.0f, 10.0f);
+    cameras[0]->SetAt(planePos);
+    XMStoreFloat4x4(&plane2WorldPos, XMMatrixScaling(10.0f, 10.0f, 10.0f)  * XMMatrixTranslation(0.0f, -5.0f, 7.5f));
+    BillboardObject(&_planeWorldPos, planePos, planeScale, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), cameras[currentCameraIndex]);
 
-    //find the angle between camera and plane
-    XMFLOAT3 planePos = XMFLOAT3(0.0, -3.0f, 7.5f);
-    XMVECTOR planeVec = XMVectorSet(planePos.x, planePos.y, planePos.z, 0.0f);
-    XMVECTOR eyeVec = XMVectorSet(cameras[currentCameraIndex]->GetPos().x, cameras[currentCameraIndex]->GetPos().y, cameras[currentCameraIndex]->GetPos().z, 0.0f);
-    XMVECTOR planeToEye = eyeVec - planeVec;
-    XMVECTOR planeNormal = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-    XMVECTOR angleVec = XMVector3AngleBetweenVectors(planeToEye, planeNormal);
-    float angle = 0.0f;
-    XMStoreFloat(&angle, angleVec);
 
-    //find the rotation axis
-    XMMATRIX cameraView = XMLoadFloat4x4(&cameras[currentCameraIndex]->GetView());
-    XMMATRIX cameraViewInverse = XMMatrixInverse(nullptr, cameraView);
-    XMVECTOR right = XMVectorSet(-1.0f, 0.0f, 0.0f, 1.0f);
-    XMVECTOR axis = XMVector3Transform(right, cameraViewInverse);
-    axis = XMVector3Normalize(axis);
-    XMFLOAT3 debugAxis;
-    XMStoreFloat3(&debugAxis, axis);
-    
-    XMStoreFloat4x4(&_planeWorldPos, XMMatrixRotationAxis(axis, 30) * XMMatrixScaling(10.0f, 10.0f, 10.0f)  * XMMatrixTranslation(0.0f, -3.0f, 7.5f) );
 }
 
 void Application::Draw()
@@ -911,11 +933,16 @@ void Application::Draw()
     _pImmediateContext->IASetVertexBuffers(0, 1, &_plVertexBuffer, &stride, &offset);
     _pImmediateContext->IASetIndexBuffer(_plIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
+    //draw plane
+    world = XMLoadFloat4x4(&plane2WorldPos);
+    cb.mWorld = XMMatrixTranspose(world);
+    _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+    _pImmediateContext->DrawIndexed(96, 0, 0);
 
     //after rendering opaque object, switch to transparency state
     _pImmediateContext->OMSetBlendState(Transparency, blendFactor, 0xffffffff);
 
-    //draw plane
+    //draw tree
     _pImmediateContext->PSSetShaderResources(0, 1, &_pTextureTree);
     world = XMLoadFloat4x4(&_planeWorldPos);
     cb.mWorld = XMMatrixTranspose(world);
