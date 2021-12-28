@@ -75,7 +75,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
     XMFLOAT3 Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
     cameras[0] = new Camera(Eye,At,Up, _WindowWidth, _WindowHeight, 0.01f, 100.0f);
 
-    Eye = XMFLOAT3(0.0f, 20.0f, -3.0f);
+    Eye = XMFLOAT3(0.0f, 7.5f, -3.0f);
     Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
     cameras[1] = new Camera(Eye, Up, _WindowWidth, _WindowHeight, 0.01f, 100.0f);
     XMFLOAT3 lerpPos1 = XMFLOAT3(10.0f, 10.0f, 15.0f);
@@ -445,6 +445,8 @@ void Application::BillboardObject(XMFLOAT4X4* objectWorldMat, XMFLOAT3 objectPos
     if (camera->GetPos().x < objectPos.x) {
         angleY = -angleY;
     }
+
+    XMStoreFloat4x4(objectWorldMat, XMMatrixScaling(objectScale.x, objectScale.y, objectScale.z) * XMMatrixRotationY(angleY) * XMMatrixTranslation(objectPos.x, objectPos.y, objectPos.z));
     //find angle for axis rotation
     XMVECTOR eyeVec = XMVectorSet(camera->GetPos().x, camera->GetPos().y, camera->GetPos().z, 0.0f);
     eyeToObj = eyeVec - objVec;
@@ -452,19 +454,81 @@ void Application::BillboardObject(XMFLOAT4X4* objectWorldMat, XMFLOAT3 objectPos
     angleVec = XMVector3AngleBetweenVectors(eyeToObj, objUpVec);
     float angle = 0.0f;
     XMStoreFloat(&angle, angleVec);
-    if (camera->GetPos().y < objectPos.y) {
-        angle = -angle;
-    }
 
     //find the rotation axis
-    XMMATRIX cameraView = XMLoadFloat4x4(&camera->GetView());
-    XMMATRIX cameraWorld = XMMatrixInverse(nullptr, cameraView); //the inverse of the view is the world matrix
     XMVECTOR right = XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f);
-    XMVECTOR axisPositionVector = XMVector3Transform(right, cameraWorld);
-    XMVECTOR axis = eyeVec- axisPositionVector;
+    XMMATRIX objWorldXMMAT = XMLoadFloat4x4(objectWorldMat);
+    XMVECTOR axisPositionVector = XMVector3Transform(right, objWorldXMMAT);
+    XMVECTOR axis =  axisPositionVector- objVec;
     axis = XMVector3Normalize(axis);
+    XMFLOAT3 float3Axis;
+    XMStoreFloat3(&float3Axis, axis);
 
-    XMStoreFloat4x4(objectWorldMat, XMMatrixScaling(objectScale.x, objectScale.y, objectScale.z)  * XMMatrixRotationY(angleY) * XMMatrixRotationAxis(-axis, -angle) * XMMatrixTranslation(objectPos.x, objectPos.y, objectPos.z));
+    XMStoreFloat4x4(objectWorldMat, XMMatrixScaling(objectScale.x, objectScale.y, objectScale.z) * XMMatrixRotationY(angleY) * XMMatrixRotationAxis(axis, angle)  * XMMatrixTranslation(objectPos.x, objectPos.y, objectPos.z));
+}
+
+HRESULT Application::CreateTerrain(ID3D11Buffer*& vertexBuffer, ID3D11Buffer*& indexBuffer, int& triangleCountDest, int rowCount, int columnCount)
+{
+    int cellRows = rowCount - 1;
+    int cellColumns = columnCount - 1;
+    int cellCount = cellRows * cellColumns;
+    int triangleCount = cellCount * 2;
+    triangleCountDest = triangleCount;
+    float cellWidth = 1.0f / cellColumns;
+    float cellHeight = 1.0f / cellRows;
+    int vertexCount = rowCount * columnCount;
+    int indexCount = triangleCount * 3;
+    std::vector<SimpleVertex> tempVertexList;
+    for (int i = 0; i < rowCount; i++) {
+        for (int j = 0; j < columnCount; j++) {
+            SimpleVertex nextVertex;
+            nextVertex.Pos = XMFLOAT3(-0.5f + j * cellWidth, 0.0f, 0.5f - i * cellHeight);
+            nextVertex.Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+            nextVertex.TexC = XMFLOAT2(0, 0);
+            tempVertexList.push_back(nextVertex);
+        }
+    }
+    D3D11_SUBRESOURCE_DATA InitData;
+    D3D11_BUFFER_DESC desc;
+    ZeroMemory(&desc, sizeof(desc));
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.ByteWidth = sizeof(SimpleVertex) * vertexCount;
+    desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    desc.CPUAccessFlags = 0;
+    ZeroMemory(&InitData, sizeof(InitData));
+    InitData.pSysMem = &(tempVertexList[0]);
+    HRESULT hr = _pd3dDevice->CreateBuffer(&desc, &InitData, &vertexBuffer);
+
+    if (FAILED(hr))
+        return hr;
+
+    std::vector<WORD> tempIndexList;
+    for (int i = 0; i < cellColumns; i++) {
+        for (int j = 0; j < cellRows; j++) {
+            tempIndexList.push_back(i * columnCount+j);
+            tempIndexList.push_back(i*columnCount+j+1);
+            tempIndexList.push_back((i+1)*columnCount+j);
+
+            tempIndexList.push_back((i+1)*columnCount+j);
+            tempIndexList.push_back(i*columnCount+j+1);
+            tempIndexList.push_back((i+1)*columnCount+j+1);
+        }
+    }
+    D3D11_BUFFER_DESC indexBufferDesc;
+    ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
+
+    indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    indexBufferDesc.ByteWidth = sizeof(WORD) * indexCount;
+    indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    indexBufferDesc.CPUAccessFlags = 0;
+    ZeroMemory(&InitData, sizeof(InitData));
+    InitData.pSysMem = &(tempIndexList[0]);
+    hr = _pd3dDevice->CreateBuffer(&indexBufferDesc, &InitData, &indexBuffer);
+
+    if (FAILED(hr))
+        return hr;
+
+    return S_OK;
 }
 
 HRESULT Application::InitWindow(HINSTANCE hInstance, int nCmdShow)
@@ -637,16 +701,9 @@ HRESULT Application::InitDevice()
 	InitShadersAndInputLayout();
 
 	InitVertexBuffer();
-
-    // Set vertex buffer
-    UINT stride = sizeof(SimpleVertex);
-    UINT offset = 0;
-    _pImmediateContext->IASetVertexBuffers(0, 1, &_pVertexBuffer, &stride, &offset);
-
 	InitIndexBuffer();
-
-    // Set index buffer
-    _pImmediateContext->IASetIndexBuffer(_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+    CreateTerrain(_terrainVertexBuffer, _terrainIndexBuffer, _terrainTriangleCount, 100, 100);
+    
 
     // Set primitive topology
     _pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -744,6 +801,8 @@ void Application::Cleanup()
     if (Transparency) Transparency->Release();
     if (_pTextureRV) _pTextureRV->Release();
     if (_pTextureTree) _pTextureTree->Release();
+    if (_terrainVertexBuffer) _terrainVertexBuffer->Release();
+    if (_terrainIndexBuffer) _terrainIndexBuffer->Release();
 }
 
 void Application::Update()
@@ -794,7 +853,7 @@ void Application::Update()
     XMMatrixDecompose(&sunScaleVec, &sunRotVec, &sunPosVec, XMLoadFloat4x4(&_sunWorldPos));
     XMFLOAT3 sunPosFloat3;
     XMStoreFloat3(&sunPosFloat3, sunPosVec);
-    //cameras[0]->SetAt(sunPosFloat3);
+    cameras[0]->SetAt(sunPosFloat3);
     if (GetAsyncKeyState(0x52) && _RKeyPressed == false) { //changing rasterizer states
         _RKeyPressed = true;
         if (_currentState == 's') {
@@ -829,11 +888,10 @@ void Application::Update()
     }
     //update camera
     cameras[currentCameraIndex]->Update(deltaTime);
-    XMFLOAT3 planePos = XMFLOAT3(0.0f, -5.0f, 25.0f);
+    XMFLOAT3 planePos = XMFLOAT3(0.0f, -5.0f, 5.0f);
     XMFLOAT3 planeScale = XMFLOAT3(10.0f, 10.0f, 10.0f);
-    cameras[0]->SetAt(planePos);
-    XMStoreFloat4x4(&plane2WorldPos, XMMatrixScaling(10.0f, 10.0f, 10.0f)  * XMMatrixTranslation(0.0f, -5.0f, 7.5f));
     BillboardObject(&_planeWorldPos, planePos, planeScale, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), cameras[currentCameraIndex]);
+    XMStoreFloat4x4(&plane2WorldPos, XMMatrixScaling(10.0f, 1.0f, 10.0f) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
 
 
 }
@@ -882,7 +940,7 @@ void Application::Draw()
     _pImmediateContext->PSSetConstantBuffers(0, 1, &_pConstantBuffer);
 
     _pImmediateContext->PSSetSamplers(0, 1, &_pSamplerLinear);
-    //change vertex and index buffer to pyramid
+    //change vertex and index buffer to sphere
     UINT stride = sizeof(SimpleVertex);
     UINT offset = 0;
     _pImmediateContext->IASetVertexBuffers(0, 1, &objMeshData.VertexBuffer, &stride, &offset);
@@ -929,17 +987,19 @@ void Application::Draw()
     _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
     _pImmediateContext->DrawIndexed(objMeshData.IndexCount, 0, 0);
 
+    //draw terrain
+    _pImmediateContext->IASetVertexBuffers(0, 1, &_terrainVertexBuffer, &stride, &offset);
+    _pImmediateContext->IASetIndexBuffer(_terrainIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+    world = XMLoadFloat4x4(&plane2WorldPos);
+    cb.mWorld = XMMatrixTranspose(world);
+    _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+    _pImmediateContext->DrawIndexed(_terrainTriangleCount*3, 0, 0);
+
     //change vertex and index buffer to plane
     _pImmediateContext->IASetVertexBuffers(0, 1, &_plVertexBuffer, &stride, &offset);
     _pImmediateContext->IASetIndexBuffer(_plIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
-    //draw plane
-    world = XMLoadFloat4x4(&plane2WorldPos);
-    cb.mWorld = XMMatrixTranspose(world);
-    _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-    _pImmediateContext->DrawIndexed(96, 0, 0);
-
-    //after rendering opaque object, switch to transparency state
+    //after rendering opaque objects, switch to transparency state
     _pImmediateContext->OMSetBlendState(Transparency, blendFactor, 0xffffffff);
 
     //draw tree

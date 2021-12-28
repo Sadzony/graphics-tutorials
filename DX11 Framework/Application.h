@@ -65,6 +65,11 @@ private:
 	ID3D11Buffer*			_pIndexBuffer;
 	ID3D11Buffer*			_plIndexBuffer;
 	ID3D11Buffer*           _pConstantBuffer;
+
+	ID3D11Buffer* _terrainVertexBuffer;
+	ID3D11Buffer* _terrainIndexBuffer;
+	int _terrainTriangleCount;
+
 	XMFLOAT4X4              _world;
 
 	Camera* cameras[2];
@@ -109,6 +114,7 @@ private:
 	HRESULT InitIndexBuffer();
 
 	void BillboardObject(XMFLOAT4X4* objectWorldMat, XMFLOAT3 objectPos, XMFLOAT3 objectScale, XMFLOAT3 objectForward, XMFLOAT3 objectUp, Camera* camera);
+	HRESULT CreateTerrain(ID3D11Buffer*& vertexBufferAddress, ID3D11Buffer*& indexBufferAdress, int& triangleCountDest, int rowCount, int columnCount);
 
 	UINT _WindowHeight;
 	UINT _WindowWidth;
