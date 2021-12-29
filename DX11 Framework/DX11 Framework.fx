@@ -92,6 +92,6 @@ float4 PS( VS_OUTPUT input ) : SV_Target
     float4 color;
     color.rgb = (diffuse + ambient + specular) * textureColor.rgb;
     color.a = textureColor.a;
-    clip(color.a - 0.25f);
+    clip(color.a - 0.1f);
     return color;
 }

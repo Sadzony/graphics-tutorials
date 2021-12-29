@@ -70,7 +70,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	XMStoreFloat4x4(&_world, XMMatrixIdentity());
 
     // Initialize the camera
-    XMFLOAT3 Eye = XMFLOAT3(2.5f, 10.0f, 7.5f);
+    XMFLOAT3 Eye = XMFLOAT3(2.5f, 50, 7.5f);
     XMFLOAT3 At = XMFLOAT3(0.0f, 0.0f, 7.5f);
     XMFLOAT3 Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
     cameras[0] = new Camera(Eye,At,Up, _WindowWidth, _WindowHeight, 0.01f, 100.0f);
@@ -84,12 +84,18 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
     lerpPositions.push_back(lerpPos1);
     lerpPositions.push_back(lerpPos2);
     lerpPositions.push_back(lerpPos3);
-
+    
     //load texture
     HRESULT hr = CreateDDSTextureFromFile(_pd3dDevice, L"Crate_COLOR.dds", nullptr, &_pTextureRV);
     if (FAILED(hr))
         return hr;
     hr = CreateDDSTextureFromFile(_pd3dDevice, L"Pine Tree.dds", nullptr, &_pTextureTree);
+    if (FAILED(hr))
+        return hr;
+    hr = CreateDDSTextureFromFile(_pd3dDevice, L"TerrainAssets/grass.dds", nullptr, &_pTextureGrass);
+    if (FAILED(hr))
+        return hr;
+    hr = CreateDDSTextureFromFile(_pd3dDevice, L"sun.dds", nullptr, &_pTextureSun);
     if (FAILED(hr))
         return hr;
     //define sampler
@@ -467,6 +473,23 @@ void Application::BillboardObject(XMFLOAT4X4* objectWorldMat, XMFLOAT3 objectPos
     XMStoreFloat4x4(objectWorldMat, XMMatrixScaling(objectScale.x, objectScale.y, objectScale.z) * XMMatrixRotationY(angleY) * XMMatrixRotationAxis(axis, angle)  * XMMatrixTranslation(objectPos.x, objectPos.y, objectPos.z));
 }
 
+void Application::BillboardObjectYOnly(XMFLOAT4X4* objectWorldMat, XMFLOAT3 objectPos, XMFLOAT3 objectScale, XMFLOAT3 objectForward, Camera* camera)
+{
+    //find the angle for Y rotation
+    XMVECTOR objVec = XMVectorSet(objectPos.x, objectPos.y, objectPos.z, 0.0f);
+    XMVECTOR eyeVecNoY = XMVectorSet(camera->GetPos().x, objectPos.y, camera->GetPos().z, 0.0f);
+    XMVECTOR eyeToObj = eyeVecNoY - objVec;
+    XMVECTOR forward = XMVectorSet(objectForward.x, objectForward.y, objectForward.z, 0.0f);
+    XMVECTOR angleVec = XMVector3AngleBetweenVectors(eyeToObj, forward);
+    float angleY = 0.0f;
+    XMStoreFloat(&angleY, angleVec);
+
+    if (camera->GetPos().x < objectPos.x) {
+        angleY = -angleY;
+    }
+    XMStoreFloat4x4(objectWorldMat, XMMatrixScaling(objectScale.x, objectScale.y, objectScale.z) * XMMatrixRotationX(1.5708f) * XMMatrixRotationY(angleY) * XMMatrixTranslation(objectPos.x, objectPos.y, objectPos.z));
+}
+
 HRESULT Application::CreateTerrain(ID3D11Buffer*& vertexBuffer, ID3D11Buffer*& indexBuffer, int& triangleCountDest, int rowCount, int columnCount)
 {
     int cellRows = rowCount - 1;
@@ -479,15 +502,20 @@ HRESULT Application::CreateTerrain(ID3D11Buffer*& vertexBuffer, ID3D11Buffer*& i
     int vertexCount = rowCount * columnCount;
     int indexCount = triangleCount * 3;
     std::vector<SimpleVertex> tempVertexList;
+    LoadHeightmap();
+    float heightMapPos = 0;
+    float heightMapFactor = 263168.0f / (columnCount*rowCount);
     for (int i = 0; i < rowCount; i++) {
         for (int j = 0; j < columnCount; j++) {
             SimpleVertex nextVertex;
-            nextVertex.Pos = XMFLOAT3(-0.5f + j * cellWidth, 0.0f, 0.5f - i * cellHeight);
+            nextVertex.Pos = XMFLOAT3(-0.5f + j * cellWidth, mHeightMap[int(heightMapPos)], 0.5f - i * cellHeight);
             nextVertex.Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-            nextVertex.TexC = XMFLOAT2(0, 0);
+            nextVertex.TexC = XMFLOAT2(j*cellWidth, i*cellHeight);
             tempVertexList.push_back(nextVertex);
+            heightMapPos += heightMapFactor;
         }
     }
+    
     D3D11_SUBRESOURCE_DATA InitData;
     D3D11_BUFFER_DESC desc;
     ZeroMemory(&desc, sizeof(desc));
@@ -530,6 +558,42 @@ HRESULT Application::CreateTerrain(ID3D11Buffer*& vertexBuffer, ID3D11Buffer*& i
 
     return S_OK;
 }
+
+void Application::LoadHeightmap()
+{
+    // A height for each vertex
+
+    std::vector<unsigned char> in(513 * 513);
+
+    // Open the file.
+
+    std::ifstream inFile;
+    std::string mapName = "TerrainAssets/Heightmap.raw";
+
+    inFile.open(mapName.c_str(), std::ios_base::binary);
+
+    if (inFile)
+
+    {
+
+        // Read the RAW bytes.
+
+        inFile.read((char*)&in[0], (std::streamsize)in.size());
+
+        // Done with file.
+        inFile.close();
+
+    }
+
+    // Copy the array data into a float array and scale it. mHeightmap.resize(heightmapHeight * heightmapWidth, 0);
+
+    for (UINT i = 0; i < 513 * 513; ++i)
+    {
+        mHeightMap[i] = (in[i] / 255.0f)*3;
+    }
+
+}
+
 
 HRESULT Application::InitWindow(HINSTANCE hInstance, int nCmdShow)
 {
@@ -702,7 +766,7 @@ HRESULT Application::InitDevice()
 
 	InitVertexBuffer();
 	InitIndexBuffer();
-    CreateTerrain(_terrainVertexBuffer, _terrainIndexBuffer, _terrainTriangleCount, 100, 100);
+    CreateTerrain(_terrainVertexBuffer, _terrainIndexBuffer, _terrainTriangleCount, 20, 20);
     
 
     // Set primitive topology
@@ -726,7 +790,8 @@ HRESULT Application::InitDevice()
     _pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 
     //set light values
-    lightDirection = XMFLOAT3(0.25f, 0.5f, -1.0f);
+    lightDirection = XMFLOAT3(0.25f, -0.5f, -1.0f);
+    lightDirection2 = XMFLOAT3(0.25f, 0.5f, -1.0f);
     diffuseMaterial = XMFLOAT4(0.8f, 0.5f, 0.5f, 1.0f);
     diffuseLight = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
     ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
@@ -834,16 +899,16 @@ void Application::Update()
     // Animate the sun
     //
     
-	XMStoreFloat4x4(&_sunWorldPos, XMMatrixScaling(1.2f, 1.2f, 1.2f) * XMMatrixRotationY(t*0.5f) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+	XMStoreFloat4x4(&_sunWorldPos, XMMatrixScaling(1.2f, 1.2f, 1.2f) * XMMatrixRotationY(t*0.5f) * XMMatrixTranslation(0.0f, 25.0f, 7.5f));
 
     //animate the planets
-    XMStoreFloat4x4(&_planet1WorldPos, XMMatrixScaling(0.5f,0.5f,0.5f)* XMMatrixRotationY(-t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f) * XMMatrixRotationY(-t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
-    XMStoreFloat4x4(&_planet2WorldPos, XMMatrixScaling(0.7f, 0.7f, 0.7f) * XMMatrixRotationY(t) * XMMatrixTranslation(8.5f, 0.0f, 0.0f) * XMMatrixRotationY(t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+    XMStoreFloat4x4(&_planet1WorldPos, XMMatrixScaling(0.5f,0.5f,0.5f)* XMMatrixRotationY(-t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f) * XMMatrixRotationY(-t) * XMMatrixTranslation(0.0f, 25.0f, 7.5f));
+    XMStoreFloat4x4(&_planet2WorldPos, XMMatrixScaling(0.7f, 0.7f, 0.7f) * XMMatrixRotationY(t) * XMMatrixTranslation(8.5f, 0.0f, 0.0f) * XMMatrixRotationY(t) * XMMatrixTranslation(0.0f, 25.0f, 7.5f));
 
     //animate the moons
 
-    XMStoreFloat4x4(&_moon1WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(1.2f, 0.0f, 0.0f) * XMMatrixRotationY(3 * t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f) * XMMatrixRotationY(-t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
-    XMStoreFloat4x4(&_moon2WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(1.2f, 0.0f, 0.0f) * XMMatrixRotationY(5*t)* XMMatrixTranslation(8.5f, 0.0f, 0.0f) * XMMatrixRotationY(t) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+    XMStoreFloat4x4(&_moon1WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(1.2f, 0.0f, 0.0f) * XMMatrixRotationY(3 * t) * XMMatrixTranslation(4.5f, 0.0f, 0.0f) * XMMatrixRotationY(-t) * XMMatrixTranslation(0.0f, 25.0f, 7.5f));
+    XMStoreFloat4x4(&_moon2WorldPos, XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(0.5f * t) * XMMatrixTranslation(1.2f, 0.0f, 0.0f) * XMMatrixRotationY(5*t)* XMMatrixTranslation(8.5f, 0.0f, 0.0f) * XMMatrixRotationY(t) * XMMatrixTranslation(0.0f, 25.0f, 7.5f));
 
 
 
@@ -888,10 +953,15 @@ void Application::Update()
     }
     //update camera
     cameras[currentCameraIndex]->Update(deltaTime);
-    XMFLOAT3 planePos = XMFLOAT3(0.0f, -5.0f, 5.0f);
-    XMFLOAT3 planeScale = XMFLOAT3(10.0f, 10.0f, 10.0f);
+    XMFLOAT3 planePos = XMFLOAT3(20, 30.0f, 5.0f);
+    XMFLOAT3 planeScale = XMFLOAT3(2.5f, 2.5f, 2.5f);
     BillboardObject(&_planeWorldPos, planePos, planeScale, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), cameras[currentCameraIndex]);
-    XMStoreFloat4x4(&plane2WorldPos, XMMatrixScaling(10.0f, 1.0f, 10.0f) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+    XMStoreFloat4x4(&plane2WorldPos, XMMatrixScaling(TERRAIN_SCALE, 1.0f, TERRAIN_SCALE) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
+
+
+    XMFLOAT3 treePos = XMFLOAT3(20, 10.0f, 25.0f);
+    XMFLOAT3 treeScale = XMFLOAT3(5.0f, 5.0f, 5.0f);
+    BillboardObjectYOnly(&treeWorldPos, treePos, treeScale, XMFLOAT3(0.0f, 0.0f, 1.0f), cameras[currentCameraIndex]);
 
 
 }
@@ -928,7 +998,7 @@ void Application::Draw()
     cb.SpecularPower = specularPower;
     cb.EyePosW = cameras[currentCameraIndex]->GetPos();
     
-    cb.LightVecw = lightDirection;
+    cb.LightVecw = lightDirection2;
     cb.gTime = updateTime;
 
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
@@ -990,6 +1060,7 @@ void Application::Draw()
     //draw terrain
     _pImmediateContext->IASetVertexBuffers(0, 1, &_terrainVertexBuffer, &stride, &offset);
     _pImmediateContext->IASetIndexBuffer(_terrainIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+    _pImmediateContext->PSSetShaderResources(0, 1, &_pTextureGrass);
     world = XMLoadFloat4x4(&plane2WorldPos);
     cb.mWorld = XMMatrixTranspose(world);
     _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
@@ -1002,8 +1073,17 @@ void Application::Draw()
     //after rendering opaque objects, switch to transparency state
     _pImmediateContext->OMSetBlendState(Transparency, blendFactor, 0xffffffff);
 
+
     //draw tree
     _pImmediateContext->PSSetShaderResources(0, 1, &_pTextureTree);
+    world = XMLoadFloat4x4(&treeWorldPos);
+    cb.mWorld = XMMatrixTranspose(world);
+    _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+
+    _pImmediateContext->DrawIndexed(96, 0, 0);
+    //draw sun
+    cb.LightVecw = lightDirection;
+    _pImmediateContext->PSSetShaderResources(0, 1, &_pTextureSun);
     world = XMLoadFloat4x4(&_planeWorldPos);
     cb.mWorld = XMMatrixTranspose(world);
     _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);

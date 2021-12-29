@@ -379,6 +379,12 @@
     <Image Include="Crate_SPEC.dds" />
     <Image Include="Hercules_COLOR.dds" />
     <Image Include="Pine Tree.dds" />
+    <Image Include="TerrainAssets\blend.dds" />
+    <Image Include="TerrainAssets\darkdirt.dds" />
+    <Image Include="TerrainAssets\grass.dds" />
+    <Image Include="TerrainAssets\lightdirt.dds" />
+    <Image Include="TerrainAssets\snow.dds" />
+    <Image Include="TerrainAssets\stone.dds" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -390,6 +396,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="DX11 Framework.fx" />
+    <None Include="TerrainAssets\Heightmap 513x513.raw" />
+    <None Include="TerrainAssets\terrain.raw" />
+    <None Include="TerrainAssets\terrain2.raw" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />

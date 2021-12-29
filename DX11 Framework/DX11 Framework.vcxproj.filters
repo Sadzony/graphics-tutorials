@@ -21,6 +21,9 @@
     <Filter Include="source files">
       <UniqueIdentifier>{eaf4b275-c869-4e41-8491-eab596a50054}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RAW files">
+      <UniqueIdentifier>{8857d6b5-b1fb-412f-99d0-4c9ccd8571af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -71,6 +74,15 @@
     <None Include="DX11 Framework.fx">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="TerrainAssets\Heightmap 513x513.raw">
+      <Filter>RAW files</Filter>
+    </None>
+    <None Include="TerrainAssets\terrain.raw">
+      <Filter>RAW files</Filter>
+    </None>
+    <None Include="TerrainAssets\terrain2.raw">
+      <Filter>RAW files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX11 Framework.rc">
@@ -91,6 +103,24 @@
       <Filter>DDS Files</Filter>
     </Image>
     <Image Include="Pine Tree.dds">
+      <Filter>DDS Files</Filter>
+    </Image>
+    <Image Include="TerrainAssets\blend.dds">
+      <Filter>DDS Files</Filter>
+    </Image>
+    <Image Include="TerrainAssets\darkdirt.dds">
+      <Filter>DDS Files</Filter>
+    </Image>
+    <Image Include="TerrainAssets\grass.dds">
+      <Filter>DDS Files</Filter>
+    </Image>
+    <Image Include="TerrainAssets\lightdirt.dds">
+      <Filter>DDS Files</Filter>
+    </Image>
+    <Image Include="TerrainAssets\snow.dds">
+      <Filter>DDS Files</Filter>
+    </Image>
+    <Image Include="TerrainAssets\stone.dds">
       <Filter>DDS Files</Filter>
     </Image>
   </ItemGroup>
