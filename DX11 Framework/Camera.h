@@ -13,6 +13,8 @@ private:
 	XMFLOAT3 _at;
 	XMFLOAT3 _up;
 	XMFLOAT3 _forward;
+	XMFLOAT3 _right;
+	float curAngle = 0;
 
 	float _windowWidth;
 	float _windowHeight;
@@ -37,9 +39,11 @@ public:
 	void SetAt(XMFLOAT3 newAt);
 	void SetUp(XMFLOAT3 newUp);
 	void SetForward(XMFLOAT3 newForward);
+	void SetRight(XMFLOAT3 newRight);
 	void SetType(CameraType newType);
 
 	void MoveDirection(XMVECTOR direction, float deltaTime);
+	void RotateLookToCamera(float rotationFactor);
 	bool LerpToPosition(XMFLOAT3 lerpPos, float deltaTime, float secondsToLerp);
 	int LerpThroughPositions(std::vector<XMFLOAT3>& listOfPositions, float deltaTime, float secondsPerPos);
 	void RotateY(XMFLOAT3 center, float newAngle);
@@ -47,6 +51,7 @@ public:
 	XMFLOAT3 GetAt();
 	XMFLOAT3 GetUp();
 	XMFLOAT3 GetForward();
+	XMFLOAT3 GetRight();
 
 	XMFLOAT4X4 GetView();
 	XMFLOAT4X4 GetProjection();

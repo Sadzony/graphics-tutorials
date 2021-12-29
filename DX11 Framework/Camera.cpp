@@ -32,6 +32,7 @@ Camera::Camera(XMFLOAT3 position, XMFLOAT3 up, float windowWidth, float windowHe
 	XMVECTOR forwardVec = XMVectorSet(_forward.x, _forward.y, _forward.z, 0.0f);
 	forwardVec = XMVector3Normalize(forwardVec);
 	XMStoreFloat3(&_forward, forwardVec);
+	_right = XMFLOAT3(1.0f, 0.0f, 0.0f);
 	XMStoreFloat4x4(&_view, XMMatrixLookToLH(eyeVec, forwardVec, upVec));
 	XMStoreFloat4x4(&_projection, XMMatrixPerspectiveFovLH(XM_PIDIV2, _windowWidth / (FLOAT)_windowHeight, _nearDepth, _farDepth));
 }
@@ -41,7 +42,7 @@ void Camera::Update(float deltaTime)
 	if (!isLerping) {
 		if (GetAsyncKeyState(0x57)) { //w key
 			if (m_Type == CameraType::LookTo) { //if look to camera then move forward
-				XMVECTOR forward = XMVectorSet(0, 0, 1, 0);
+				XMVECTOR forward = XMVectorSet(_forward.x, _forward.y, _forward.z, 0);
 				MoveDirection(forward, deltaTime);
 			}
 			else if (m_Type == CameraType::LookAt) { //if look at camera then zoom in
@@ -66,7 +67,7 @@ void Camera::Update(float deltaTime)
 		}
 		else if (GetAsyncKeyState(0x53)) { //s key
 			if (m_Type == CameraType::LookTo) { //if look to camera then move backwards
-				XMVECTOR back = XMVectorSet(0, 0, -1, 0);
+				XMVECTOR back = XMVectorSet(-_forward.x, -_forward.y, -_forward.z, 0);
 				MoveDirection(back, deltaTime);
 			}
 			else if (m_Type == CameraType::LookAt) { //if look at camera then zoom out
@@ -77,19 +78,42 @@ void Camera::Update(float deltaTime)
 		}
 
 		if (GetAsyncKeyState(0x41)) { //A key
-			if (m_Type == CameraType::LookTo) { //if look to camera then move left
-				XMVECTOR left = XMVectorSet(-1, 0, 0, 0);
+			if (m_Type == CameraType::LookTo) {
+				XMVECTOR left = XMVectorSet(-_right.x, -_right.y, -_right.z, 0);
 				MoveDirection(left, deltaTime);
+			}
+		}
+
+		else if (GetAsyncKeyState(0x44)) { //D Key
+			if (m_Type == CameraType::LookTo) {
+				XMVECTOR right = XMVectorSet(_right.x, _right.y, _right.z, 0);
+				MoveDirection(right, deltaTime);
+			}
+		}
+		if (GetAsyncKeyState(0x10)) { //shift key
+			if (m_Type == CameraType::LookTo) {
+				XMVECTOR down = XMVectorSet(-_up.x, -_up.y, -_up.z, 0);
+				MoveDirection(down, deltaTime);
+			}
+		}
+
+		else if (GetAsyncKeyState(0x20)) { //Space Key
+			if (m_Type == CameraType::LookTo) {
+				XMVECTOR up = XMVectorSet(_up.x, _up.y, _up.z, 0);
+				MoveDirection(up, deltaTime);
+			}
+		}
+		if (GetAsyncKeyState(0x51)) { //Q key
+			if (m_Type == CameraType::LookTo) {
+				RotateLookToCamera(-CAMERA_ROTATE_SPEED * deltaTime);
 			}
 			else if (m_Type == CameraType::LookAt) {
 				RotateY(_at, CAMERA_ROTATE_SPEED * deltaTime);
 			}
 		}
-
-		else if (GetAsyncKeyState(0x44)) { //D Key
-			if (m_Type == CameraType::LookTo) { //if look to camera then move right
-				XMVECTOR right = XMVectorSet(1, 0, 0, 0);
-				MoveDirection(right, deltaTime);
+		else if (GetAsyncKeyState(0x45)) { //E Key
+			if (m_Type == CameraType::LookTo) {
+				RotateLookToCamera(CAMERA_ROTATE_SPEED * deltaTime);
 			}
 			else if (m_Type == CameraType::LookAt) {
 				RotateY(_at, -CAMERA_ROTATE_SPEED * deltaTime);
@@ -128,6 +152,11 @@ void Camera::SetForward(XMFLOAT3 newForward)
 	_forward = newForward;
 }
 
+void Camera::SetRight(XMFLOAT3 newRight)
+{
+	_right = newRight;
+}
+
 void Camera::SetType(CameraType newType)
 {
 	m_Type = newType;
@@ -141,6 +170,30 @@ void Camera::MoveDirection(XMVECTOR direction, float deltaTime)
 	XMStoreFloat3(&newPos, newPosVec);
 	SetPos(newPos);
 }
+
+void Camera::RotateLookToCamera(float rotationFactor)
+{
+	if (m_Type == CameraType::LookTo) {
+		XMFLOAT4X4 forward4x4;
+		XMFLOAT4X4 right4x4;
+		XMStoreFloat4x4(&forward4x4, XMMatrixTranslation(_forward.x, _forward.y, _forward.z) * XMMatrixRotationY(rotationFactor));
+		XMStoreFloat4x4(&right4x4, XMMatrixTranslation(_right.x, _right.y, _right.z) * XMMatrixRotationY(rotationFactor));
+		XMMATRIX forwardMat = XMLoadFloat4x4(&forward4x4);
+		XMMATRIX rightMat = XMLoadFloat4x4(&right4x4);
+
+		XMVECTOR forwardV, rightV;
+		XMVECTOR forwardVRot, rightVRot;
+		XMVECTOR forwardVSc, rightVSc;
+		XMMatrixDecompose(&forwardVSc, &forwardVRot, &forwardV, forwardMat);
+		XMMatrixDecompose(&rightVSc, &rightVRot, &rightV, rightMat);
+		XMFLOAT3 forwardFloat3, rightFloat3;
+		XMStoreFloat3(&forwardFloat3, forwardV);
+		XMStoreFloat3(&rightFloat3, rightV);
+		this->SetForward(forwardFloat3);
+		this->SetRight(rightFloat3);
+	}
+}
+
 
 bool Camera::LerpToPosition(XMFLOAT3 lerpPos, float deltaTime, float secondsToLerp)
 {
@@ -212,6 +265,11 @@ XMFLOAT3 Camera::GetUp()
 XMFLOAT3 Camera::GetForward()
 {
 	return _forward;
+}
+
+XMFLOAT3 Camera::GetRight()
+{
+	return _right;
 }
 
 XMFLOAT4X4 Camera::GetView()
