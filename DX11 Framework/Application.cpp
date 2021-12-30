@@ -504,8 +504,9 @@ HRESULT Application::CreateTerrain(ID3D11Buffer*& vertexBuffer, ID3D11Buffer*& i
     std::vector<SimpleVertex> tempVertexList;
     LoadHeightmap();
     float heightMapPos = 0;
-    float heightMapFactor = 263168.0f / (columnCount*rowCount);
+    float heightMapFactor = 513.0f / rowCount;
     for (int i = 0; i < rowCount; i++) {
+        heightMapPos =  (513 * i);
         for (int j = 0; j < columnCount; j++) {
             SimpleVertex nextVertex;
             nextVertex.Pos = XMFLOAT3(-0.5f + j * cellWidth, mHeightMap[int(heightMapPos)], 0.5f - i * cellHeight);
@@ -589,7 +590,7 @@ void Application::LoadHeightmap()
 
     for (UINT i = 0; i < 513 * 513; ++i)
     {
-        mHeightMap[i] = (in[i] / 255.0f)*3;
+        mHeightMap[i] = (in[i] / 255.0f)*25;
     }
 
 }
@@ -766,7 +767,7 @@ HRESULT Application::InitDevice()
 
 	InitVertexBuffer();
 	InitIndexBuffer();
-    CreateTerrain(_terrainVertexBuffer, _terrainIndexBuffer, _terrainTriangleCount, 20, 20);
+    CreateTerrain(_terrainVertexBuffer, _terrainIndexBuffer, _terrainTriangleCount, 100, 100);
     
 
     // Set primitive topology

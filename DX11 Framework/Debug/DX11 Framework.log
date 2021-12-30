@@ -3,39 +3,41 @@ C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Applicatio
 C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(76,40): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
 C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(80,52): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
 C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(80,38): warning C4244: 'argument': conversion from 'UINT' to 'float', possible loss of data
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(536,52): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
-          with
-          [
-              _Ty=unsigned short
-          ]
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(509,30): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(537,52): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
           with
           [
               _Ty=unsigned short
           ]
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(538,54): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(538,52): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
           with
           [
               _Ty=unsigned short
           ]
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(540,54): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(539,54): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
           with
           [
               _Ty=unsigned short
           ]
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(541,52): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(541,54): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
           with
           [
               _Ty=unsigned short
           ]
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(542,56): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(542,52): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
           with
           [
               _Ty=unsigned short
           ]
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(949,22): warning C4389: '==': signed/unsigned mismatch
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(980): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(543,56): warning C4244: 'argument': conversion from 'int' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=unsigned short
+          ]
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(950,22): warning C4389: '==': signed/unsigned mismatch
 C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(981): warning C4238: nonstandard extension used: class rvalue used as lvalue
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(980,70): warning C4238: nonstandard extension used: class rvalue used as lvalue
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(981,82): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(982): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(981,70): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(982,82): warning C4238: nonstandard extension used: class rvalue used as lvalue
+Application.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
   DX11 Framework.vcxproj -> C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Debug\DX11 Framework.exe
