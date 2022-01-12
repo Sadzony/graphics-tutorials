@@ -34,10 +34,9 @@ C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Applicatio
           [
               _Ty=unsigned short
           ]
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(950,22): warning C4389: '==': signed/unsigned mismatch
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(981): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(951,22): warning C4389: '==': signed/unsigned mismatch
 C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(982): warning C4238: nonstandard extension used: class rvalue used as lvalue
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(981,70): warning C4238: nonstandard extension used: class rvalue used as lvalue
-C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(982,82): warning C4238: nonstandard extension used: class rvalue used as lvalue
-Application.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(983): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(982,70): warning C4238: nonstandard extension used: class rvalue used as lvalue
+C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Application.cpp(983,82): warning C4238: nonstandard extension used: class rvalue used as lvalue
   DX11 Framework.vcxproj -> C:\Users\szymo\Programming\graphics\graphics-tutorials\DX11 Framework\Debug\DX11 Framework.exe

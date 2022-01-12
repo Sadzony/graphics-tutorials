@@ -79,12 +79,13 @@ private:
 
 	//light objects
 	XMFLOAT3 lightDirection;
-	XMFLOAT3 lightDirection2;
 	XMFLOAT4 diffuseMaterial;
 	XMFLOAT4 diffuseLight;
 
+	XMFLOAT4 ambientLight2;
 	XMFLOAT4 ambientLight;
 	XMFLOAT4 ambientMaterial;
+	XMFLOAT4 ambientMaterial2;
 
 	XMFLOAT4 specularLight;
 	XMFLOAT4 specularMaterial;

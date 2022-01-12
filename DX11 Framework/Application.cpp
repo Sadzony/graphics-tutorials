@@ -506,7 +506,7 @@ HRESULT Application::CreateTerrain(ID3D11Buffer*& vertexBuffer, ID3D11Buffer*& i
     float heightMapPos = 0;
     float heightMapFactor = 513.0f / rowCount;
     for (int i = 0; i < rowCount; i++) {
-        heightMapPos =  (513 * i);
+        heightMapPos =  (513 * int(i*heightMapFactor));
         for (int j = 0; j < columnCount; j++) {
             SimpleVertex nextVertex;
             nextVertex.Pos = XMFLOAT3(-0.5f + j * cellWidth, mHeightMap[int(heightMapPos)], 0.5f - i * cellHeight);
@@ -767,7 +767,7 @@ HRESULT Application::InitDevice()
 
 	InitVertexBuffer();
 	InitIndexBuffer();
-    CreateTerrain(_terrainVertexBuffer, _terrainIndexBuffer, _terrainTriangleCount, 100, 100);
+    CreateTerrain(_terrainVertexBuffer, _terrainIndexBuffer, _terrainTriangleCount, 20, 20);
     
 
     // Set primitive topology
@@ -791,12 +791,13 @@ HRESULT Application::InitDevice()
     _pImmediateContext->PSSetShader(_pPixelShader, nullptr, 0);
 
     //set light values
-    lightDirection = XMFLOAT3(0.25f, -0.5f, -1.0f);
-    lightDirection2 = XMFLOAT3(0.25f, 0.5f, -1.0f);
+    lightDirection = XMFLOAT3(0.25f, 0.5f, -1.0f);
     diffuseMaterial = XMFLOAT4(0.8f, 0.5f, 0.5f, 1.0f);
     diffuseLight = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
     ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+    ambientLight2 = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
     ambientMaterial = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+    ambientMaterial2 = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
     specularLight = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
     specularMaterial = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
     specularPower = 10.0f;
@@ -960,7 +961,7 @@ void Application::Update()
     XMStoreFloat4x4(&plane2WorldPos, XMMatrixScaling(TERRAIN_SCALE, 1.0f, TERRAIN_SCALE) * XMMatrixTranslation(0.0f, 0.0f, 7.5f));
 
 
-    XMFLOAT3 treePos = XMFLOAT3(20, 10.0f, 25.0f);
+    XMFLOAT3 treePos = XMFLOAT3(20, 18.0f, 25.0f);
     XMFLOAT3 treeScale = XMFLOAT3(5.0f, 5.0f, 5.0f);
     BillboardObjectYOnly(&treeWorldPos, treePos, treeScale, XMFLOAT3(0.0f, 0.0f, 1.0f), cameras[currentCameraIndex]);
 
@@ -999,7 +1000,7 @@ void Application::Draw()
     cb.SpecularPower = specularPower;
     cb.EyePosW = cameras[currentCameraIndex]->GetPos();
     
-    cb.LightVecw = lightDirection2;
+    cb.LightVecw = lightDirection;
     cb.gTime = updateTime;
 
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
@@ -1082,8 +1083,11 @@ void Application::Draw()
     _pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 
     _pImmediateContext->DrawIndexed(96, 0, 0);
+    float blendFactor2[] = { 0.75f, 0.75f, 0.75f, 1.0f };
+    _pImmediateContext->OMSetBlendState(Transparency, blendFactor2, 0xffffffff);
     //draw sun
-    cb.LightVecw = lightDirection;
+    cb.AmbientLight = ambientLight2;
+    cb.AmbientMaterial = ambientMaterial2;
     _pImmediateContext->PSSetShaderResources(0, 1, &_pTextureSun);
     world = XMLoadFloat4x4(&_planeWorldPos);
     cb.mWorld = XMMatrixTranspose(world);
